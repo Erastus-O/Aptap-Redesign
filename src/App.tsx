@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { HashRouter, Route, Routes } from "react-router-dom";
 import Compare from "./pages/Compare";
 import Deals from "./pages/Deals";
 import Home from "./pages/Home";
@@ -8,7 +8,7 @@ import { AppStateProvider } from "./store/AppState";
 export default function App() {
   return (
     <AppStateProvider>
-      <BrowserRouter>
+      <HashRouter>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/deals" element={<Deals />} />
@@ -16,7 +16,7 @@ export default function App() {
           <Route path="/compare" element={<Compare />} />
           <Route path="*" element={<Home />} />
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </AppStateProvider>
   );
 }
