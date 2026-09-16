@@ -189,7 +189,7 @@ export default function Deals() {
                   compareDisabled={state.compareIds.length >= 3}
                   onToggleCompare={() => toggleCompare(deal.id)}
                   onChoose={() => handleChoose(deal.id)}
-                  onViewDetails={() => handleChoose(deal.id)}
+                  onViewDetails={() => navigate(`/deal/${deal.id}`)}
                 />
               ))}
             </div>
@@ -222,7 +222,12 @@ export default function Deals() {
             {otherDeals.length > 0 ? (
               <div>
                 {otherDeals.map((deal) => (
-                  <DealRow key={deal.id} deal={deal} onChoose={() => handleChoose(deal.id)} />
+                  <DealRow
+                    key={deal.id}
+                    deal={deal}
+                    onChoose={() => handleChoose(deal.id)}
+                    onViewDetails={() => navigate(`/deal/${deal.id}`)}
+                  />
                 ))}
               </div>
             ) : (

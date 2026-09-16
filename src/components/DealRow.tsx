@@ -1,4 +1,3 @@
-import { useState } from "react";
 import type { Deal } from "../types";
 import { PROVIDERS } from "../data/providers";
 import { formatPrice, incentiveLabel } from "../lib/format";
@@ -7,10 +6,10 @@ import ProviderLogo from "./ProviderLogo";
 interface Props {
   deal: Deal;
   onChoose: () => void;
+  onViewDetails: () => void;
 }
 
-export default function DealRow({ deal, onChoose }: Props) {
-  const [expanded, setExpanded] = useState(false);
+export default function DealRow({ deal, onChoose, onViewDetails }: Props) {
   const provider = PROVIDERS[deal.provider];
 
   return (
@@ -53,11 +52,10 @@ export default function DealRow({ deal, onChoose }: Props) {
 
         <div className="flex gap-3 lg:ml-auto">
           <button
-            onClick={() => setExpanded((v) => !v)}
-            className="px-4 py-2.5 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors font-medium text-sm flex items-center gap-1.5 whitespace-nowrap"
+            onClick={onViewDetails}
+            className="px-4 py-2.5 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors font-medium text-sm whitespace-nowrap"
           >
             View full details
-            <span className={`transition-transform ${expanded ? "rotate-180" : ""}`}>⌄</span>
           </button>
           <button
             onClick={onChoose}
@@ -67,32 +65,6 @@ export default function DealRow({ deal, onChoose }: Props) {
           </button>
         </div>
       </div>
-
-      {expanded && (
-        <div className="mt-4 ml-0 lg:ml-[52px] rounded-xl bg-gray-50 p-4 text-sm text-gray-600 grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <p>{deal.description}</p>
-          <div>
-            <p className="text-xs text-gray-400">Setup fee</p>
-            <p className="font-semibold text-gray-900">
-              {deal.setupFee === 0 ? "Free" : formatPrice(deal.setupFee)}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs text-gray-400">Customer rating</p>
-            <p className="font-semibold text-gray-900">
-              {deal.rating.toFixed(1)}. {deal.reviews.toLocaleString()} reviews
-            </p>
-          </div>
-          {deal.priceRise && (
-            <div>
-              <p className="text-xs text-gray-400">Price after promo</p>
-              <p className="font-semibold text-gray-900">
-                {formatPrice(deal.priceRise.amount)} from month {deal.priceRise.fromMonth}
-              </p>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 }
