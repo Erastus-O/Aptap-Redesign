@@ -54,7 +54,7 @@ interface AppStateContextValue {
   selectAddress: (address: string) => void;
   toggleProvider: (slug: ProviderSlug) => void;
   clearProviders: () => void;
-  selectAllProviders: () => void;
+  setProviders: (slugs: ProviderSlug[]) => void;
   setOnlyProvider: (slug: ProviderSlug) => void;
   toggleCompare: (dealId: string) => void;
   clearCompare: () => void;
@@ -91,8 +91,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
             : [...s.selectedProviders, slug],
         })),
       clearProviders: () => setState((s) => ({ ...s, selectedProviders: [] })),
-      selectAllProviders: () =>
-        setState((s) => ({ ...s, selectedProviders: ["virgin", "bt", "plusnet", "sky", "ee"] })),
+      setProviders: (slugs) => setState((s) => ({ ...s, selectedProviders: slugs })),
       setOnlyProvider: (slug) => setState((s) => ({ ...s, selectedProviders: [slug] })),
       toggleCompare: (dealId) =>
         setState((s) => {

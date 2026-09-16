@@ -4,6 +4,18 @@ const STREETS = [
   "Hawthorn Drive",
   "Willow Court",
   "Maple Gardens",
+  "Cedar Row",
+  "Foxglove Lane",
+];
+
+const PLACES = [
+  { area: "Hampton Vale", town: "Peterborough" },
+  { area: "Chorlton", town: "Manchester" },
+  { area: "Southville", town: "Bristol" },
+  { area: "Headingley", town: "Leeds" },
+  { area: "Shawlands", town: "Glasgow" },
+  { area: "Roath", town: "Cardiff" },
+  { area: "Jesmond", town: "Newcastle" },
 ];
 
 function hashString(input: string): number {
@@ -25,14 +37,12 @@ export function isLikelyPostcode(raw: string): boolean {
 
 export function findAddresses(postcode: string): string[] {
   const clean = normalizePostcode(postcode);
-  const seed = hashString(clean);
-  const street = STREETS[seed % STREETS.length];
-  const town = "Peterborough";
-  const area = "Hampton Vale";
+  const street = STREETS[hashString(`${clean}|street`) % STREETS.length];
+  const place = PLACES[hashString(`${clean}|place`) % PLACES.length];
   const count = 5;
   const addresses: string[] = [];
   for (let i = 1; i <= count; i++) {
-    addresses.push(`${i}, ${street}, ${area}, ${town}`);
+    addresses.push(`${i}, ${street}, ${place.area}, ${place.town}`);
   }
   return addresses;
 }

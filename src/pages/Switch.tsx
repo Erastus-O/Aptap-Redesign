@@ -4,7 +4,7 @@ import Header from "../components/Header";
 import ProviderLogo from "../components/ProviderLogo";
 import { getDeal } from "../data/deals";
 import { PROVIDER_LIST, PROVIDERS } from "../data/providers";
-import { currentYearOptions, formatPrice, incentiveLabel, MONTHS } from "../lib/format";
+import { currentYearOptions, formatPrice, incentiveLabel, isMoreThan30DaysOut, MONTHS } from "../lib/format";
 import { useAppState } from "../store/AppState";
 
 const STEP_LABELS = ["Your current setup", "Contact & install", "Review & confirm"];
@@ -36,8 +36,6 @@ export default function Switch() {
   function validateStep1() {
     const e: Record<string, string> = {};
     if (!form.fullName.trim()) e.fullName = "Enter your full name as it appears on the bill";
-    if (!form.currentProvider) e.currentProvider = "Select your current provider";
-    if (!form.contractEndMonth || !form.contractEndYear) e.contractEnd = "Select when your contract ends";
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -198,10 +196,8 @@ export default function Switch() {
                     </option>
                   ))}
                   <option value="other">Someone else / no broadband</option>
+                  <option value="not_sure">Not sure</option>
                 </select>
-                {errors.currentProvider && (
-                  <p className="text-xs text-rose-600 mt-1">{errors.currentProvider}</p>
-                )}
               </div>
 
               <div>
@@ -218,6 +214,7 @@ export default function Switch() {
                         {m}
                       </option>
                     ))}
+                    <option value="not_sure">Not sure</option>
                   </select>
                   <select
                     value={form.contractEndYear}
@@ -230,10 +227,22 @@ export default function Switch() {
                         {y}
                       </option>
                     ))}
+                    <option value="not_sure">Not sure</option>
                   </select>
                 </div>
-                {errors.contractEnd && <p className="text-xs text-rose-600 mt-1">{errors.contractEnd}</p>}
               </div>
+
+              {isMoreThan30DaysOut(form.contractEndMonth, form.contractEndYear) && (
+                <div className="rounded-xl bg-amber-50 border border-amber-100 px-4 py-3 flex items-start gap-2.5">
+                  <span aria-hidden className="text-base leading-none mt-0.5">
+                    ⚠️
+                  </span>
+                  <p className="text-sm text-amber-900">
+                    You may still be in contract until {form.contractEndMonth} {form.contractEndYear}. We'll
+                    confirm this with you before you commit — it won't stop you from continuing now.
+                  </p>
+                </div>
+              )}
 
               <p className="text-xs text-gray-400 border-t border-gray-100 pt-4">
                 We would check if you're free to switch without an exit fee. If you're still in contract,
@@ -356,15 +365,18 @@ export default function Switch() {
                   <span className="font-semibold">
                     {form.currentProvider === "other"
                       ? "Someone else / no broadband"
-                      : form.currentProvider
-                        ? PROVIDERS[form.currentProvider].name
-                        : "-"}
+                      : form.currentProvider === "not_sure" || !form.currentProvider
+                        ? "Not sure"
+                        : PROVIDERS[form.currentProvider].name}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500">Current contract ends</span>
                   <span className="font-semibold">
-                    {form.contractEndMonth} {form.contractEndYear}
+                    {form.contractEndMonth === "not_sure" || form.contractEndYear === "not_sure" ||
+                    (!form.contractEndMonth && !form.contractEndYear)
+                      ? "Not sure"
+                      : `${form.contractEndMonth} ${form.contractEndYear}`}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">

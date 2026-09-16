@@ -1,10 +1,10 @@
-import type { Deal } from "../types";
+import type { RecommendedDeal } from "../types";
 import { PROVIDERS } from "../data/providers";
 import { formatPrice, incentiveLabel } from "../lib/format";
 import ProviderLogo from "./ProviderLogo";
 
 interface Props {
-  deal: Deal;
+  deal: RecommendedDeal;
   compareChecked: boolean;
   compareDisabled: boolean;
   onToggleCompare: () => void;
@@ -26,7 +26,7 @@ export default function DealCard({
     <div className="rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex flex-col bg-white">
       <div className="bg-[#0b0b12] text-white p-6 flex-1">
         <div className="flex items-center justify-between mb-4">
-          <span className="text-[11px] font-bold tracking-wide text-gray-300">BEST FIT FOR YOU</span>
+          <span className="text-[11px] font-bold tracking-wide text-gray-300">{deal.reasonLabel}</span>
           <label className="flex items-center gap-1.5 text-xs text-gray-300 cursor-pointer select-none">
             <input
               type="checkbox"
@@ -49,7 +49,12 @@ export default function DealCard({
           </div>
         </div>
 
-        <p className="text-sm text-gray-300 mb-4">{deal.description}</p>
+        <p className="text-sm text-gray-300 mb-3">{deal.greatFor}</p>
+
+        <div className="rounded-lg bg-white/5 border border-white/10 px-3 py-2 mb-4">
+          <p className="text-[11px] font-semibold text-emerald-300 mb-0.5">Why we recommend it</p>
+          <p className="text-xs text-gray-300">{deal.reasonText}</p>
+        </div>
 
         <p className="text-xs text-gray-400 mb-1">Monthly price</p>
         <p className="text-3xl font-extrabold mb-4">{formatPrice(deal.priceMonthly)}</p>
@@ -71,7 +76,8 @@ export default function DealCard({
           </span>
           {deal.priceRise ? (
             <span className="inline-flex items-center gap-1.5 text-xs font-medium bg-amber-400/15 text-amber-200 rounded-full px-3 py-1">
-              ↑ Rises to {formatPrice(deal.priceRise.amount)} from month {deal.priceRise.fromMonth}
+              ↑ {formatPrice(deal.priceMonthly)}/mo now, {formatPrice(deal.priceRise.amount)}/mo from month{" "}
+              {deal.priceRise.fromMonth}
             </span>
           ) : deal.priceFixedForTerm ? (
             <span className="inline-flex items-center gap-1.5 text-xs font-medium bg-amber-400/15 text-amber-200 rounded-full px-3 py-1">

@@ -4,15 +4,17 @@ import Header from "../components/Header";
 import ProviderLogo from "../components/ProviderLogo";
 import { PROVIDER_LIST } from "../data/providers";
 import { findAddresses, isLikelyPostcode } from "../lib/address";
+import { availableProvidersFor } from "../lib/availability";
 import { useAppState } from "../store/AppState";
 import type { ProviderSlug } from "../types";
 
 export default function Home() {
   const navigate = useNavigate();
-  const { state, setPostcodeSearch, selectAddress, selectAllProviders, setOnlyProvider } = useAppState();
+  const { state, setPostcodeSearch, selectAddress, setProviders, setOnlyProvider } = useAppState();
   const [postcodeInput, setPostcodeInput] = useState(state.postcode);
   const [error, setError] = useState<string | null>(null);
   const [showResults, setShowResults] = useState(state.addresses.length > 0);
+  const [checkingAddress, setCheckingAddress] = useState<string | null>(null);
 
   function handleCheckAvailability(e: React.FormEvent) {
     e.preventDefault();
@@ -27,14 +29,17 @@ export default function Home() {
   }
 
   function handleSelectAddress(address: string) {
-    selectAddress(address);
-    selectAllProviders();
-    navigate("/deals");
+    setCheckingAddress(address);
+    window.setTimeout(() => {
+      selectAddress(address);
+      setProviders(availableProvidersFor(state.postcode));
+      navigate("/deals");
+    }, 700);
   }
 
   function handleViewProviderDeals(slug: ProviderSlug) {
+    const fallbackPostcode = state.selectedAddress ? state.postcode : postcodeInput || "PE7 8PD";
     if (!state.selectedAddress) {
-      const fallbackPostcode = postcodeInput || "PE7 8PD";
       const addresses = findAddresses(fallbackPostcode);
       setPostcodeSearch(fallbackPostcode, addresses);
       selectAddress(addresses[0]);
@@ -103,16 +108,29 @@ export default function Home() {
                   </button>
                 </div>
                 <ul>
-                  {state.addresses.map((address) => (
-                    <li key={address} className="border-b border-gray-50 last:border-0">
-                      <button
-                        onClick={() => handleSelectAddress(address)}
-                        className="w-full text-left px-6 py-4 hover:bg-indigo-50 transition-colors"
-                      >
-                        {address}
-                      </button>
-                    </li>
-                  ))}
+                  {state.addresses.map((address) => {
+                    const isChecking = checkingAddress === address;
+                    return (
+                      <li key={address} className="border-b border-gray-50 last:border-0">
+                        <button
+                          onClick={() => handleSelectAddress(address)}
+                          disabled={checkingAddress !== null}
+                          className="w-full flex items-center justify-between text-left px-6 py-4 hover:bg-indigo-50 transition-colors disabled:cursor-wait disabled:hover:bg-transparent"
+                        >
+                          <span className={isChecking ? "text-gray-400" : undefined}>{address}</span>
+                          {isChecking && (
+                            <span className="flex items-center gap-2 text-xs font-medium text-indigo-600">
+                              <span
+                                className="w-3.5 h-3.5 rounded-full border-2 border-indigo-200 border-t-indigo-600 animate-spin"
+                                aria-hidden
+                              />
+                              Checking your line...
+                            </span>
+                          )}
+                        </button>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             )}
