@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Accordion from "../components/Accordion";
+import Carousel from "../components/Carousel";
 import Header from "../components/Header";
 import DealCard from "../components/DealCard";
 import DealRow from "../components/DealRow";
@@ -114,17 +115,6 @@ export default function Deals() {
             Edit your answers ✎
           </button>
         </div>
-
-        <div className="mt-4 rounded-2xl bg-indigo-50 border border-indigo-100 px-5 py-3.5 flex items-start gap-3">
-          <span aria-hidden className="text-lg leading-none">
-            🛡️
-          </span>
-          <p className="text-sm text-indigo-900">
-            <span className="font-semibold">We'll check your exit fees before you switch.</span> Tell us
-            who you're with today in the next step and we'll flag it if you look like you're still in
-            contract — it won't stop you from continuing.
-          </p>
-        </div>
       </section>
 
       <section className="mx-auto max-w-[1728px] px-6 py-8 grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-6 items-start">
@@ -173,25 +163,27 @@ export default function Deals() {
           )}
         </aside>
 
-        <div className="rounded-2xl bg-white shadow-sm p-6">
+        <div className="rounded-2xl bg-white shadow-sm p-6 min-w-0">
           <h2 className="text-lg font-extrabold">Recommended for you</h2>
           <p className="text-gray-500 text-sm mt-1 mb-6">
             We currently have {recommended.length} deals that match your requirements
           </p>
 
           {recommended.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 mb-10">
-              {recommended.map((deal) => (
-                <DealCard
-                  key={deal.id}
-                  deal={deal}
-                  compareChecked={state.compareIds.includes(deal.id)}
-                  compareDisabled={state.compareIds.length >= 3}
-                  onToggleCompare={() => toggleCompare(deal.id)}
-                  onChoose={() => handleChoose(deal.id)}
-                  onViewDetails={() => navigate(`/deal/${deal.id}`)}
-                />
-              ))}
+            <div className="mb-10">
+              <Carousel>
+                {recommended.map((deal) => (
+                  <DealCard
+                    key={deal.id}
+                    deal={deal}
+                    compareChecked={state.compareIds.includes(deal.id)}
+                    compareDisabled={state.compareIds.length >= 3}
+                    onToggleCompare={() => toggleCompare(deal.id)}
+                    onChoose={() => handleChoose(deal.id)}
+                    onViewDetails={() => navigate(`/deal/${deal.id}`)}
+                  />
+                ))}
+              </Carousel>
             </div>
           ) : (
             <p className="text-sm text-gray-400 mb-10">
@@ -220,7 +212,7 @@ export default function Deals() {
             </div>
 
             {otherDeals.length > 0 ? (
-              <div>
+              <div className="flex flex-col gap-4">
                 {otherDeals.map((deal) => (
                   <DealRow
                     key={deal.id}

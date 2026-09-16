@@ -13,7 +13,7 @@ export default function DealRow({ deal, onChoose, onViewDetails }: Props) {
   const provider = PROVIDERS[deal.provider];
 
   return (
-    <div className="border-b border-gray-100 last:border-0 py-5">
+    <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-5">
       <div className="flex flex-col lg:flex-row lg:items-center gap-4">
         <div className="flex items-center gap-3 min-w-[220px]">
           <ProviderLogo provider={deal.provider} size={36} />
