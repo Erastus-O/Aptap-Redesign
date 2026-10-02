@@ -5,9 +5,9 @@ import Carousel from "../components/Carousel";
 import Header from "../components/Header";
 import DealCard from "../components/DealCard";
 import DealRow from "../components/DealRow";
-import { DEALS, getDeal } from "../data/deals";
 import { PROVIDER_LIST } from "../data/providers";
 import { availableDealsFor, availableProvidersFor, getCoverage } from "../lib/availability";
+import { currentMonthlyPrice } from "../lib/price";
 import { getRecommendations } from "../lib/recommend";
 import { useAppState } from "../store/AppState";
 
@@ -37,13 +37,13 @@ const BEFORE_YOU_SWITCH = [
     id: "contract",
     question: "What am I committing to?",
     answer:
-      "Each deal shows its contract length up front — typically 18 or 24 months. You're not tied to ApTap itself; the contract is directly between you and the new provider, and you can cancel within the provider's standard cooling-off period after signing up.",
+      "Each deal shows its contract length up front — most are 24 months, some are shorter, and a few run rolling monthly with no fixed term at all. You're not tied to ApTap itself; the contract is directly between you and the new provider.",
   },
   {
     id: "price",
     question: "Will my price change during the contract?",
     answer:
-      "Where a deal includes an introductory price, the card shows both the current price and what it rises to, and from which month. Some deals are price-fixed for the whole term instead — that's called out on the card too.",
+      "Where a provider has published future price rises, the card shows the current price and what it rises to, and from when. Some providers only note that prices may change without giving exact figures, and some show what you'd pay if you stayed on past the end of your contract — all of that is shown on the card, not hidden until checkout.",
   },
   {
     id: "exit-fee",
@@ -55,7 +55,8 @@ const BEFORE_YOU_SWITCH = [
 
 export default function Deals() {
   const navigate = useNavigate();
-  const { state, toggleProvider, clearProviders, setProviders, toggleCompare, chooseDeal } = useAppState();
+  const { state, deals, toggleProvider, clearProviders, setProviders, toggleCompare, chooseDeal } =
+    useAppState();
   const [tab, setTab] = useState<Tab>("all");
 
   useEffect(() => {
@@ -66,9 +67,15 @@ export default function Deals() {
 
   const coverage = useMemo(() => getCoverage(state.postcode), [state.postcode]);
 
-  const addressDeals = useMemo(() => availableDealsFor(DEALS, state.postcode), [state.postcode]);
+  const addressDeals = useMemo(
+    () => availableDealsFor(deals.deals, state.postcode),
+    [deals.deals, state.postcode]
+  );
 
-  const addressProviders = useMemo(() => availableProvidersFor(state.postcode), [state.postcode]);
+  const addressProviders = useMemo(
+    () => availableProvidersFor(deals.deals, state.postcode),
+    [deals.deals, state.postcode]
+  );
 
   const filteredDeals = useMemo(
     () => addressDeals.filter((d) => state.selectedProviders.includes(d.provider)),
@@ -81,10 +88,14 @@ export default function Deals() {
   const otherDeals = useMemo(() => {
     const rest = filteredDeals.filter((d) => !recommendedIds.has(d.id));
     const sorted = [...rest];
-    if (tab === "cheapest") sorted.sort((a, b) => a.priceMonthly - b.priceMonthly);
-    if (tab === "fastest") sorted.sort((a, b) => b.speedMbps - a.speedMbps);
+    if (tab === "cheapest") sorted.sort((a, b) => currentMonthlyPrice(a) - currentMonthlyPrice(b));
+    if (tab === "fastest") sorted.sort((a, b) => (b.download_mbps ?? 0) - (a.download_mbps ?? 0));
     if (tab === "streaming")
-      sorted.sort((a, b) => (b.speedMbps >= 100 ? 1 : 0) - (a.speedMbps >= 100 ? 1 : 0) || b.rating - a.rating);
+      sorted.sort(
+        (a, b) =>
+          ((b.download_mbps ?? 0) >= 100 ? 1 : 0) - ((a.download_mbps ?? 0) >= 100 ? 1 : 0) ||
+          (b.download_mbps ?? 0) - (a.download_mbps ?? 0)
+      );
     return sorted;
   }, [filteredDeals, recommendedIds, tab]);
 
@@ -93,9 +104,33 @@ export default function Deals() {
     navigate("/switch");
   }
 
-  const compareDeals = state.compareIds.map((id) => getDeal(id)).filter(Boolean);
+  const compareDeals = state.compareIds.map((id) => deals.deals.find((d) => d.id === id)).filter(Boolean);
 
   if (!state.selectedAddress) return null;
+
+  if (deals.loading) {
+    return (
+      <div className="min-h-screen bg-gray-100">
+        <Header />
+        <div className="mx-auto max-w-2xl px-6 py-20 text-center">
+          <div className="w-8 h-8 rounded-full border-2 border-gray-200 border-t-indigo-600 animate-spin mx-auto mb-4" />
+          <p className="text-gray-500">Finding deals near you…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (deals.error) {
+    return (
+      <div className="min-h-screen bg-gray-100">
+        <Header />
+        <div className="mx-auto max-w-2xl px-6 py-20 text-center">
+          <p className="text-gray-700 font-semibold mb-2">We couldn't load today's deals</p>
+          <p className="text-gray-500 text-sm">{deals.error}. Try refreshing the page.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 pb-28">
@@ -234,6 +269,19 @@ export default function Deals() {
             </p>
             <Accordion items={BEFORE_YOU_SWITCH} />
           </div>
+
+          {deals.updatedAt && (
+            <p className="text-xs text-gray-400 mt-8 pt-6 border-t border-gray-100">
+              Prices checked{" "}
+              {new Date(deals.updatedAt).toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
+              , taken from each provider's own website. Actual price and availability depend on your
+              address — we simulate coverage by postcode here since the feed itself isn't address-aware.
+            </p>
+          )}
         </div>
       </section>
 
@@ -249,10 +297,10 @@ export default function Deals() {
                   key={deal!.id}
                   className="inline-flex items-center gap-2 bg-gray-100 rounded-full pl-3 pr-2 py-1.5 text-sm font-medium"
                 >
-                  {deal!.planName}
+                  {deal!.name}
                   <button
                     onClick={() => toggleCompare(deal!.id)}
-                    aria-label={`Remove ${deal!.planName} from compare`}
+                    aria-label={`Remove ${deal!.name} from compare`}
                     className="w-5 h-5 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-xs"
                   >
                     ✕

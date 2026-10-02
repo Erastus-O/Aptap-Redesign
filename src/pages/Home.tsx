@@ -10,7 +10,7 @@ import type { ProviderSlug } from "../types";
 
 export default function Home() {
   const navigate = useNavigate();
-  const { state, setPostcodeSearch, selectAddress, setProviders, setOnlyProvider } = useAppState();
+  const { state, deals, setPostcodeSearch, selectAddress, setProviders, setOnlyProvider } = useAppState();
   const [postcodeInput, setPostcodeInput] = useState(state.postcode);
   const [error, setError] = useState<string | null>(null);
   const [showResults, setShowResults] = useState(state.addresses.length > 0);
@@ -32,7 +32,7 @@ export default function Home() {
     setCheckingAddress(address);
     window.setTimeout(() => {
       selectAddress(address);
-      setProviders(availableProvidersFor(state.postcode));
+      setProviders(availableProvidersFor(deals.deals, state.postcode));
       navigate("/deals");
     }, 700);
   }
@@ -89,6 +89,11 @@ export default function Home() {
               </button>
             </form>
             {error && <p className="mt-2 text-sm text-rose-300">{error}</p>}
+            {deals.error && (
+              <p className="mt-2 text-sm text-rose-300">
+                We couldn't load today's deals ({deals.error}). Try refreshing the page.
+              </p>
+            )}
 
             {showResults && state.addresses.length > 0 && (
               <div className="mt-6 max-w-3xl rounded-2xl bg-white text-gray-900 shadow-2xl overflow-hidden">
@@ -152,13 +157,25 @@ export default function Home() {
                 <span className="font-semibold">{provider.name}</span>
                 <button
                   onClick={() => handleViewProviderDeals(provider.slug)}
-                  className="w-full py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-700 transition-colors text-white text-sm font-semibold"
+                  disabled={deals.loading}
+                  className="w-full py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-wait transition-colors text-white text-sm font-semibold"
                 >
-                  View deals
+                  {deals.loading ? "Loading…" : "View deals"}
                 </button>
               </div>
             ))}
           </div>
+          {deals.updatedAt && (
+            <p className="text-xs text-gray-400 mt-6">
+              Deals checked {new Date(deals.updatedAt).toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
+              . Headline prices from each provider's own website — actual price and availability depend on
+              your address. TalkTalk and Community Fibre aren't included yet.
+            </p>
+          )}
         </div>
       </section>
     </div>

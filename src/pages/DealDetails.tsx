@@ -2,31 +2,38 @@ import { useEffect, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Header from "../components/Header";
 import ProviderLogo from "../components/ProviderLogo";
-import { DEALS, getDeal } from "../data/deals";
 import { PROVIDERS } from "../data/providers";
 import { availableDealsFor } from "../lib/availability";
-import { firstYearCost, formatPrice, incentiveLabel } from "../lib/format";
+import { formatPrice } from "../lib/format";
+import {
+  currentMonthlyPrice,
+  firstYearCost,
+  formatContract,
+  formatSetupFee,
+  formatSpeed,
+  technologyLabel,
+} from "../lib/price";
 import { getRecommendations } from "../lib/recommend";
 import { useAppState } from "../store/AppState";
 
 export default function DealDetails() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const { state, chooseDeal, toggleCompare } = useAppState();
+  const { state, deals, chooseDeal, toggleCompare } = useAppState();
 
-  const deal = id ? getDeal(id) : undefined;
+  const deal = id ? deals.deals.find((d) => d.id === id) : undefined;
 
   useEffect(() => {
     if (!state.selectedAddress) {
       navigate("/", { replace: true });
-    } else if (!deal) {
+    } else if (!deals.loading && !deal) {
       navigate("/deals", { replace: true });
     }
-  }, [state.selectedAddress, deal, navigate]);
+  }, [state.selectedAddress, deals.loading, deal, navigate]);
 
   const filteredDeals = useMemo(
-    () => availableDealsFor(DEALS, state.postcode).filter((d) => state.selectedProviders.includes(d.provider)),
-    [state.postcode, state.selectedProviders]
+    () => availableDealsFor(deals.deals, state.postcode).filter((d) => state.selectedProviders.includes(d.provider)),
+    [deals.deals, state.postcode, state.selectedProviders]
   );
   const recommended = useMemo(() => getRecommendations(filteredDeals), [filteredDeals]);
   const recommendedMatch = deal ? recommended.find((r) => r.id === deal.id) : undefined;
@@ -34,6 +41,7 @@ export default function DealDetails() {
   if (!state.selectedAddress || !deal) return null;
 
   const provider = PROVIDERS[deal.provider];
+  const price = currentMonthlyPrice(deal);
 
   const knownCurrentProvider =
     state.switchForm.currentProvider &&
@@ -69,87 +77,97 @@ export default function DealDetails() {
               <div className="flex items-center gap-3 mt-4 mb-3">
                 <ProviderLogo provider={deal.provider} size={40} />
                 <div>
-                  <h1 className="font-bold text-xl leading-tight">{deal.planName}</h1>
+                  <h1 className="font-bold text-xl leading-tight">{deal.name}</h1>
                   <p className="text-sm text-gray-400">
-                    {provider.name} · {deal.connection}
+                    {provider.name} · {technologyLabel(deal.technology)}
                   </p>
                 </div>
               </div>
 
-              <p className="text-sm text-gray-300 mb-5">{recommendedMatch?.greatFor ?? deal.description}</p>
+              <p className="text-sm text-gray-300 mb-5">
+                {recommendedMatch?.greatFor ?? formatSpeed(deal.download_mbps, deal.download_note)}
+              </p>
 
               <div className="flex gap-8 mb-5">
                 <div>
-                  <p className="text-xs text-gray-400">Speed</p>
-                  <p className="font-semibold">{deal.speedMbps}mb</p>
+                  <p className="text-xs text-gray-400">Download</p>
+                  <p className="font-semibold">{formatSpeed(deal.download_mbps, deal.download_note)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400">Upload</p>
+                  <p className="font-semibold">{formatSpeed(deal.upload_mbps)}</p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-400">Contract</p>
-                  <p className="font-semibold">{deal.contractMonths} months</p>
+                  <p className="font-semibold">{formatContract(deal.contract_months)}</p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-400">Setup fee</p>
-                  <p className="font-semibold">{deal.setupFee === 0 ? "Free" : formatPrice(deal.setupFee)}</p>
+                  <p className="font-semibold">{formatSetupFee(deal.setup_fee)}</p>
                 </div>
               </div>
 
               <div className="flex flex-wrap gap-2">
-                <span className="inline-flex items-center gap-1.5 text-xs font-medium bg-emerald-500/20 text-emerald-300 rounded-full px-3 py-1">
-                  🎁 {incentiveLabel(deal)}
-                </span>
-                {deal.priceRise ? (
-                  <span className="inline-flex items-center gap-1.5 text-xs font-medium bg-amber-400/15 text-amber-200 rounded-full px-3 py-1">
-                    ↑ {formatPrice(deal.priceMonthly)}/mo now, {formatPrice(deal.priceRise.amount)}/mo from
-                    month {deal.priceRise.fromMonth}
+                {deal.reward && (
+                  <span className="inline-flex items-center gap-1.5 text-xs font-medium bg-emerald-500/20 text-emerald-300 rounded-full px-3 py-1">
+                    🎁 {deal.reward}
                   </span>
-                ) : deal.priceFixedForTerm ? (
-                  <span className="inline-flex items-center gap-1.5 text-xs font-medium bg-amber-400/15 text-amber-200 rounded-full px-3 py-1">
-                    Price fixed for the term
-                  </span>
-                ) : null}
+                )}
               </div>
             </div>
 
             <div className="rounded-2xl bg-white shadow-sm p-6">
               <h2 className="text-lg font-extrabold mb-4">Pricing transparency</h2>
-              <div className="rounded-xl border border-gray-100 p-5">
-                {deal.priceRise ? (
-                  <>
-                    <div className="flex items-center justify-between pb-4 border-b border-gray-100">
-                      <div>
-                        <p className="text-xs text-gray-400">Now until month {deal.priceRise.fromMonth - 1}</p>
-                        <p className="text-xl font-bold">{formatPrice(deal.priceMonthly)}/m</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between pt-4">
-                      <div>
-                        <p className="text-xs text-gray-400">From month {deal.priceRise.fromMonth}</p>
-                        <p className="text-xl font-bold text-amber-600">
-                          {formatPrice(deal.priceRise.amount)}/m
-                        </p>
-                      </div>
-                      <span className="text-xs font-medium bg-amber-50 text-amber-700 rounded-full px-3 py-1 h-fit">
-                        Price rise
-                      </span>
-                    </div>
-                  </>
-                ) : (
-                  <div className="flex items-center justify-between">
+              <div className="rounded-xl border border-gray-100 p-5 flex flex-col gap-4">
+                <div>
+                  <p className="text-xs text-gray-400">Now</p>
+                  <p className="text-xl font-bold">{formatPrice(price)}/m</p>
+                </div>
+
+                {deal.price_rises.map((rise) => (
+                  <div
+                    key={rise.from}
+                    className="flex items-center justify-between pt-4 border-t border-gray-100"
+                  >
                     <div>
                       <p className="text-xs text-gray-400">
-                        {deal.priceFixedForTerm ? `Fixed for all ${deal.contractMonths} months` : "Every month"}
+                        From{" "}
+                        {new Date(rise.from).toLocaleDateString("en-GB", {
+                          month: "long",
+                          year: "numeric",
+                        })}
                       </p>
-                      <p className="text-xl font-bold">{formatPrice(deal.priceMonthly)}/m</p>
+                      <p className="text-xl font-bold text-amber-600">{formatPrice(rise.monthly_price)}/m</p>
                     </div>
-                    {deal.priceFixedForTerm && (
-                      <span className="text-xs font-medium bg-emerald-50 text-emerald-700 rounded-full px-3 py-1 h-fit">
-                        Price fixed
-                      </span>
-                    )}
+                    <span className="text-xs font-medium bg-amber-50 text-amber-700 rounded-full px-3 py-1 h-fit">
+                      Price rise
+                    </span>
+                  </div>
+                ))}
+
+                {deal.price_rises.length === 0 && deal.price_rise_note && (
+                  <p className="text-sm text-amber-700 bg-amber-50 rounded-lg px-3 py-2 border-t-0">
+                    {deal.price_rise_note}
+                  </p>
+                )}
+
+                {deal.out_of_contract_price != null && (
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                    <div>
+                      <p className="text-xs text-gray-400">
+                        After your {formatContract(deal.contract_months).toLowerCase()} contract ends
+                      </p>
+                      <p className="text-lg font-bold text-gray-700">
+                        {formatPrice(deal.out_of_contract_price)}/m
+                      </p>
+                    </div>
                   </div>
                 )}
-                <p className="text-sm text-gray-500 mt-4 pt-4 border-t border-gray-100">
-                  Estimated first year cost: <span className="font-semibold text-gray-900">£{firstYearCost(deal)}</span>
+
+                <p className="text-sm text-gray-500 pt-4 border-t border-gray-100">
+                  Estimated first-year cost:{" "}
+                  <span className="font-semibold text-gray-900">{formatPrice(firstYearCost(deal))}</span>
+                  {deal.setup_fee ? ` (includes a ${formatPrice(deal.setup_fee)} setup fee)` : null}
                 </p>
               </div>
             </div>
@@ -159,7 +177,9 @@ export default function DealDetails() {
               <div className="rounded-xl bg-indigo-50 border border-indigo-100 p-5">
                 {knownCurrentProvider ? (
                   <>
-                    <p className="font-semibold text-indigo-900 mb-1">You told us you're with {knownCurrentProvider}</p>
+                    <p className="font-semibold text-indigo-900 mb-1">
+                      You told us you're with {knownCurrentProvider}
+                    </p>
                     <p className="text-sm text-indigo-800">
                       When you switch, we'll confirm your contract end date and flag any exit fee before you
                       commit to anything.
@@ -178,19 +198,25 @@ export default function DealDetails() {
             </div>
 
             <div className="rounded-2xl bg-white shadow-sm p-6">
-              <h2 className="text-lg font-extrabold mb-4">Why this provider</h2>
-              <div className="rounded-xl border border-gray-100 p-5">
-                <div className="flex items-baseline gap-2 mb-2">
-                  <span className="text-2xl font-extrabold">{deal.rating.toFixed(1)}</span>
-                  <span className="text-sm text-gray-500">{deal.reviews.toLocaleString()} reviews</span>
-                </div>
-                <p className="text-sm text-gray-600 mb-4">
-                  Rating from {provider.name} customers who reviewed their service on ApTap.
-                </p>
+              <h2 className="text-lg font-extrabold mb-4">More about this deal</h2>
+              <div className="rounded-xl border border-gray-100 p-5 flex flex-col gap-4">
+                {deal.guaranteed_mbps != null && (
+                  <div>
+                    <p className="text-xs text-gray-400 mb-0.5">Guaranteed minimum speed</p>
+                    <p className="text-sm text-gray-700">
+                      <span className="font-semibold text-gray-900">{deal.guaranteed_mbps}Mb</span> — the
+                      slowest this line is allowed to run before you can exit penalty-free, under the
+                      provider's speed guarantee.
+                    </p>
+                  </div>
+                )}
+                {deal.setup_note && (
+                  <div>
+                    <p className="text-xs text-gray-400 mb-0.5">Setup</p>
+                    <p className="text-sm text-gray-700">{deal.setup_note}</p>
+                  </div>
+                )}
                 <div className="flex flex-wrap gap-2">
-                  <span className="text-xs font-medium bg-violet-50 text-violet-700 rounded-full px-3 py-1">
-                    Hassle-free switch
-                  </span>
                   <span className="text-xs font-medium bg-violet-50 text-violet-700 rounded-full px-3 py-1">
                     14-day cooling-off period
                   </span>
@@ -198,6 +224,14 @@ export default function DealDetails() {
                     Barclays partner marketplace
                   </span>
                 </div>
+                <a
+                  href={deal.source_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-medium text-indigo-600 hover:text-indigo-700 w-fit"
+                >
+                  View this offer on {provider.name}'s website ↗
+                </a>
               </div>
             </div>
           </div>
@@ -205,36 +239,36 @@ export default function DealDetails() {
           <div className="lg:sticky lg:top-6 rounded-2xl bg-white shadow-sm p-6 flex flex-col gap-4">
             <div>
               <p className="text-sm text-gray-500">
-                {provider.name} | {deal.planName}
+                {provider.name} | {deal.name}
               </p>
               <p className="text-xs text-gray-400 mt-1">from</p>
-              <p className="text-2xl font-extrabold">{formatPrice(deal.priceMonthly)}/m</p>
-              {deal.priceRise && (
+              <p className="text-2xl font-extrabold">{formatPrice(price)}/m</p>
+              {deal.price_rises.length > 0 ? (
                 <p className="text-sm font-medium text-amber-600 mt-1">
-                  Rises to {formatPrice(deal.priceRise.amount)}/mo from month {deal.priceRise.fromMonth}
+                  Rising to {formatPrice(deal.price_rises[deal.price_rises.length - 1].monthly_price)}/mo by{" "}
+                  {new Date(deal.price_rises[deal.price_rises.length - 1].from).getFullYear()}
                 </p>
-              )}
-              {deal.priceFixedForTerm && (
-                <p className="text-sm font-medium text-emerald-600 mt-1">Price fixed for the term</p>
-              )}
+              ) : deal.price_rise_note ? (
+                <p className="text-xs text-amber-600 mt-1">{deal.price_rise_note}</p>
+              ) : null}
             </div>
 
             <div className="flex flex-col gap-2.5 border-t border-gray-100 pt-4">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-500">Speed</span>
-                <span className="font-semibold">{deal.speedMbps}Mb</span>
+                <span className="text-gray-500">Download</span>
+                <span className="font-semibold">{formatSpeed(deal.download_mbps, deal.download_note)}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-500">Contract</span>
-                <span className="font-semibold">{deal.contractMonths} months</span>
+                <span className="font-semibold">{formatContract(deal.contract_months)}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-500">Setup fee</span>
-                <span className="font-semibold">{deal.setupFee === 0 ? "Free" : formatPrice(deal.setupFee)}</span>
+                <span className="font-semibold">{formatSetupFee(deal.setup_fee)}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-500">Est. first year</span>
-                <span className="font-semibold">£{firstYearCost(deal)}</span>
+                <span className="font-semibold">{formatPrice(firstYearCost(deal))}</span>
               </div>
             </div>
 

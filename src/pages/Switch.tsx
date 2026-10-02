@@ -2,24 +2,24 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import ProviderLogo from "../components/ProviderLogo";
-import { getDeal } from "../data/deals";
 import { PROVIDER_LIST, PROVIDERS } from "../data/providers";
-import { currentYearOptions, formatPrice, incentiveLabel, isMoreThan30DaysOut, MONTHS } from "../lib/format";
+import { currentYearOptions, formatPrice, isMoreThan30DaysOut, MONTHS } from "../lib/format";
+import { currentMonthlyPrice, formatContract, formatSpeed, technologyLabel } from "../lib/price";
 import { useAppState } from "../store/AppState";
 
 const STEP_LABELS = ["Your current setup", "Contact & install", "Review & confirm"];
 
 export default function Switch() {
   const navigate = useNavigate();
-  const { state, setSwitchStep, updateSwitchForm, resetSwitchFlow } = useAppState();
+  const { state, deals, setSwitchStep, updateSwitchForm, resetSwitchFlow } = useAppState();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [reference] = useState(() => `APT-${Math.floor(100000 + Math.random() * 900000)}`);
 
-  const deal = state.chosenDealId ? getDeal(state.chosenDealId) : undefined;
+  const deal = state.chosenDealId ? deals.deals.find((d) => d.id === state.chosenDealId) : undefined;
 
   useEffect(() => {
-    if (!deal) navigate("/deals", { replace: true });
-  }, [deal, navigate]);
+    if (!deals.loading && !deal) navigate("/deals", { replace: true });
+  }, [deals.loading, deal, navigate]);
 
   if (!deal) return null;
 
@@ -61,7 +61,7 @@ export default function Switch() {
             </div>
             <h1 className="text-2xl font-extrabold mb-2">You're all set, {form.fullName.split(" ")[0]}!</h1>
             <p className="text-gray-500 mb-6">
-              We've started your switch to {provider.name} {deal.planName}. Your reference number is{" "}
+              We've started your switch to {provider.name} {deal.name}. Your reference number is{" "}
               <span className="font-semibold text-gray-800">{reference}</span>.
             </p>
             <div className="rounded-xl bg-gray-50 p-5 text-left mb-8">
@@ -110,17 +110,14 @@ export default function Switch() {
             <div className="flex items-center gap-4">
               <ProviderLogo provider={deal.provider} size={40} />
               <div>
-                <h2 className="font-bold text-lg leading-tight">{deal.planName}</h2>
+                <h2 className="font-bold text-lg leading-tight">{deal.name}</h2>
                 <p className="text-sm text-gray-500">
-                  {provider.name} · {deal.connection}
+                  {provider.name} · {technologyLabel(deal.technology)}
                 </p>
               </div>
-              <span className="inline-flex items-center gap-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 rounded-full px-3 py-1">
-                🎁 {incentiveLabel(deal)}
-              </span>
-              {deal.priceFixedForTerm && (
-                <span className="text-xs font-medium bg-amber-50 text-amber-700 rounded-full px-3 py-1">
-                  Price fixed for the term
+              {deal.reward && (
+                <span className="inline-flex items-center gap-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 rounded-full px-3 py-1">
+                  🎁 {deal.reward}
                 </span>
               )}
             </div>
@@ -137,15 +134,15 @@ export default function Switch() {
           <div className="flex gap-10 mt-4">
             <div>
               <p className="text-xs text-gray-400">Speed</p>
-              <p className="font-semibold">{deal.speedMbps}mb</p>
+              <p className="font-semibold">{formatSpeed(deal.download_mbps, deal.download_note)}</p>
             </div>
             <div>
               <p className="text-xs text-gray-400">Monthly price</p>
-              <p className="font-semibold">{formatPrice(deal.priceMonthly)}</p>
+              <p className="font-semibold">{formatPrice(currentMonthlyPrice(deal))}</p>
             </div>
             <div>
               <p className="text-xs text-gray-400">Contract</p>
-              <p className="font-semibold">{deal.contractMonths} months</p>
+              <p className="font-semibold">{formatContract(deal.contract_months)}</p>
             </div>
           </div>
         </div>
@@ -153,8 +150,8 @@ export default function Switch() {
         <div className="rounded-2xl bg-white shadow-sm p-6">
           <h1 className="text-xl font-extrabold mb-1">Let's get you that Broadband deal</h1>
           <p className="text-gray-500 text-sm mb-5">
-            You've picked {provider.name} {deal.planName}. {formatPrice(deal.priceMonthly)}/month. We just
-            need to confirm your current setup
+            You've picked {provider.name} {deal.name}. {formatPrice(currentMonthlyPrice(deal))}/month. We
+            just need to confirm your current setup
           </p>
 
           <p className="text-sm font-semibold mb-2">
@@ -398,9 +395,10 @@ export default function Switch() {
               </div>
 
               <p className="text-xs text-gray-400">
-                By confirming, you agree to switch your broadband to {provider.name} {deal.planName} at{" "}
-                {formatPrice(deal.priceMonthly)}/month on an {deal.contractMonths}-month contract. You can
-                cancel free of charge within 14 days.
+                By confirming, you agree to switch your broadband to {provider.name} {deal.name} at{" "}
+                {formatPrice(currentMonthlyPrice(deal))}/month on a{" "}
+                {formatContract(deal.contract_months).toLowerCase()} contract. You can cancel free of charge
+                within 14 days.
               </p>
 
               <div className="flex gap-3">

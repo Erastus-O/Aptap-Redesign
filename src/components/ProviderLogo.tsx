@@ -9,7 +9,7 @@ export default function ProviderLogo({ provider, size = 40 }: Props) {
   const style = { width: size, height: size, fontSize: size * 0.34 };
 
   switch (provider) {
-    case "virgin":
+    case "Virgin Media":
       return (
         <div
           style={style}
@@ -20,13 +20,9 @@ export default function ProviderLogo({ provider, size = 40 }: Props) {
           </span>
         </div>
       );
-    case "bt":
+    case "BT":
       return (
-        <div
-          style={style}
-          className="flex items-center justify-center rounded-full shrink-0"
-          data-color="#6534ac"
-        >
+        <div style={style} className="flex items-center justify-center rounded-full shrink-0">
           <div className="w-full h-full rounded-full bg-[#5b1fb4] flex items-center justify-center">
             <span className="font-extrabold text-white tracking-tight" style={{ fontSize: size * 0.32 }}>
               BT
@@ -34,7 +30,7 @@ export default function ProviderLogo({ provider, size = 40 }: Props) {
           </div>
         </div>
       );
-    case "plusnet":
+    case "Plusnet":
       return (
         <div
           style={style}
@@ -45,7 +41,7 @@ export default function ProviderLogo({ provider, size = 40 }: Props) {
           </span>
         </div>
       );
-    case "sky":
+    case "Sky":
       return (
         <div
           style={style}
@@ -56,14 +52,25 @@ export default function ProviderLogo({ provider, size = 40 }: Props) {
           </span>
         </div>
       );
-    case "ee":
+    case "Vodafone":
+      return (
+        <div style={style} className="flex items-center justify-center rounded-full bg-[#e60000] shrink-0">
+          <span
+            className="font-black text-white rounded-full border-2 border-white flex items-center justify-center"
+            style={{ width: size * 0.6, height: size * 0.6, fontSize: size * 0.32 }}
+          >
+            !
+          </span>
+        </div>
+      );
+    case "Hyperoptic":
       return (
         <div
           style={style}
-          className="flex items-center justify-center rounded-full bg-[#00b1a9] shrink-0"
+          className="flex items-center justify-center rounded-full bg-[#d2006e] shrink-0"
         >
-          <span className="font-black text-[#f5d800]" style={{ fontSize: size * 0.3 }}>
-            EE
+          <span className="font-black text-white" style={{ fontSize: size * 0.4 }}>
+            H
           </span>
         </div>
       );

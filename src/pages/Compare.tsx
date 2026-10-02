@@ -2,9 +2,17 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import ProviderLogo from "../components/ProviderLogo";
-import { getDeal } from "../data/deals";
 import { PROVIDERS } from "../data/providers";
-import { firstYearCost, formatPrice, incentiveLabel } from "../lib/format";
+import { formatPrice } from "../lib/format";
+import {
+  currentMonthlyPrice,
+  firstYearCost,
+  formatContract,
+  formatSetupFee,
+  formatSpeed,
+  nextPriceRise,
+  technologyLabel,
+} from "../lib/price";
 import { useAppState } from "../store/AppState";
 import type { Deal } from "../types";
 
@@ -20,69 +28,91 @@ const ROWS: Row[] = [
   {
     label: "Monthly price",
     better: "lower",
-    render: (d) => formatPrice(d.priceMonthly),
-    value: (d) => d.priceMonthly,
+    render: (d) => `${formatPrice(currentMonthlyPrice(d))}/mo`,
+    value: (d) => currentMonthlyPrice(d),
   },
   {
-    label: "Price after promo",
+    label: "Next price change",
     better: "lower",
-    render: (d) => (d.priceRise ? `${formatPrice(d.priceRise.amount)} from month ${d.priceRise.fromMonth}` : "No change"),
-    value: (d) => d.priceRise?.amount ?? d.priceMonthly,
+    render: (d) => {
+      const rise = nextPriceRise(d);
+      if (rise) {
+        return `${formatPrice(rise.monthly_price)} from ${new Date(rise.from).toLocaleDateString("en-GB", { month: "short", year: "numeric" })}`;
+      }
+      return d.price_rise_note ?? "No published change";
+    },
+    value: (d) => nextPriceRise(d)?.monthly_price ?? currentMonthlyPrice(d),
   },
   {
     label: "Est. first-year cost",
-    sub: "Monthly price x12, plus any rise that lands within the first year",
+    sub: "Current price × 12, plus any published rise that lands within the first year",
     better: "lower",
-    render: (d) => `£${firstYearCost(d)}`,
+    render: (d) => formatPrice(firstYearCost(d)),
     value: (d) => firstYearCost(d),
+  },
+  {
+    label: "After contract ends",
+    sub: "What you'd pay per month if you didn't switch away when the contract finishes",
+    better: "lower",
+    render: (d) => (d.out_of_contract_price != null ? `${formatPrice(d.out_of_contract_price)}/mo` : "—"),
+    value: (d) => d.out_of_contract_price ?? Infinity,
   },
   {
     label: "Download speed",
     better: "higher",
-    render: (d) => `${d.speedMbps}Mb`,
-    value: (d) => d.speedMbps,
+    render: (d) => formatSpeed(d.download_mbps, d.download_note),
+    value: (d) => d.download_mbps ?? 0,
+  },
+  {
+    label: "Upload speed",
+    better: "higher",
+    render: (d) => formatSpeed(d.upload_mbps),
+    value: (d) => d.upload_mbps ?? 0,
+  },
+  {
+    label: "Guaranteed minimum speed",
+    sub: "The slowest the line is allowed to run before you can exit penalty-free",
+    better: "higher",
+    render: (d) => formatSpeed(d.guaranteed_mbps),
+    value: (d) => d.guaranteed_mbps ?? 0,
   },
   {
     label: "Contract length",
     better: "none",
-    render: (d) => `${d.contractMonths} months`,
+    render: (d) => formatContract(d.contract_months),
     value: () => 0,
   },
   {
     label: "Setup fee",
     better: "lower",
-    render: (d) => (d.setupFee === 0 ? "Free" : formatPrice(d.setupFee)),
-    value: (d) => d.setupFee,
+    render: (d) => formatSetupFee(d.setup_fee),
+    value: (d) => d.setup_fee ?? Infinity,
   },
   {
     label: "Connection",
     better: "none",
-    render: (d) => d.connection,
+    render: (d) => technologyLabel(d.technology),
     value: () => 0,
   },
   {
-    label: "Incentive",
-    better: "higher",
-    render: (d) => incentiveLabel(d),
-    value: (d) => d.incentive.amount,
-  },
-  {
-    label: "Customer rating",
-    better: "higher",
-    render: (d) => `${d.rating.toFixed(1)}. ${d.reviews.toLocaleString()} reviews`,
-    value: (d) => d.rating,
+    label: "Reward",
+    better: "none",
+    render: (d) => d.reward ?? "—",
+    value: () => 0,
   },
 ];
 
 export default function Compare() {
   const navigate = useNavigate();
-  const { state, chooseDeal, toggleCompare } = useAppState();
+  const { state, deals: dealsFeed, chooseDeal, toggleCompare } = useAppState();
 
-  const deals = state.compareIds.map((id) => getDeal(id)).filter((d): d is Deal => Boolean(d));
+  const deals = state.compareIds
+    .map((id) => dealsFeed.deals.find((d) => d.id === id))
+    .filter((d): d is Deal => Boolean(d));
 
   useEffect(() => {
-    if (deals.length < 2) navigate("/deals", { replace: true });
-  }, [deals.length, navigate]);
+    if (!dealsFeed.loading && deals.length < 2) navigate("/deals", { replace: true });
+  }, [dealsFeed.loading, deals.length, navigate]);
 
   if (deals.length < 2) return null;
 
@@ -131,7 +161,7 @@ export default function Compare() {
                         <div className="flex justify-center mb-2">
                           <ProviderLogo provider={deal.provider} size={40} />
                         </div>
-                        <p className="font-bold">{deal.planName}</p>
+                        <p className="font-bold">{deal.name}</p>
                         <p className="text-xs text-gray-500 mb-3">{PROVIDERS[deal.provider].name}</p>
                         <button
                           onClick={() => handleChoose(deal.id)}
@@ -168,7 +198,8 @@ export default function Compare() {
                         {row.sub && <p className="text-xs text-gray-400 mt-0.5">{row.sub}</p>}
                       </td>
                       {deals.map((deal, i) => {
-                        const isBest = winningValue !== null && !isTie && values[i] === winningValue;
+                        const isBest =
+                          winningValue !== null && isFinite(winningValue) && !isTie && values[i] === winningValue;
                         return (
                           <td
                             key={deal.id}

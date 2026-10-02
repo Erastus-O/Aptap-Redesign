@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useDeals } from "../hooks/useDeals";
 import type { ProviderSlug, SwitchFormData } from "../types";
 
 const STORAGE_KEY = "aptap-broadband-state-v1";
@@ -30,7 +31,7 @@ const defaultState: AppStateShape = {
   postcode: "",
   addresses: [],
   selectedAddress: null,
-  selectedProviders: ["virgin", "bt", "plusnet", "sky", "ee"],
+  selectedProviders: [],
   compareIds: [],
   chosenDealId: null,
   switchStep: 1,
@@ -50,6 +51,7 @@ function loadInitial(): AppStateShape {
 
 interface AppStateContextValue {
   state: AppStateShape;
+  deals: ReturnType<typeof useDeals>;
   setPostcodeSearch: (postcode: string, addresses: string[]) => void;
   selectAddress: (address: string) => void;
   toggleProvider: (slug: ProviderSlug) => void;
@@ -68,6 +70,7 @@ const AppStateContext = createContext<AppStateContextValue | null>(null);
 
 export function AppStateProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AppStateShape>(loadInitial);
+  const deals = useDeals();
 
   useEffect(() => {
     try {
@@ -80,6 +83,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   const value = useMemo<AppStateContextValue>(
     () => ({
       state,
+      deals,
       setPostcodeSearch: (postcode, addresses) =>
         setState((s) => ({ ...s, postcode, addresses, selectedAddress: null })),
       selectAddress: (address) => setState((s) => ({ ...s, selectedAddress: address })),
@@ -110,7 +114,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
       resetSwitchFlow: () =>
         setState((s) => ({ ...s, chosenDealId: null, switchStep: 1, switchForm: emptySwitchForm })),
     }),
-    [state]
+    [state, deals]
   );
 
   return <AppStateContext.Provider value={value}>{children}</AppStateContext.Provider>;

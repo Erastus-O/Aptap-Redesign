@@ -1,6 +1,7 @@
 import type { Deal } from "../types";
 import { PROVIDERS } from "../data/providers";
-import { formatPrice, incentiveLabel } from "../lib/format";
+import { formatPrice } from "../lib/format";
+import { currentMonthlyPrice, formatSpeed, nextPriceRise } from "../lib/price";
 import ProviderLogo from "./ProviderLogo";
 
 interface Props {
@@ -11,6 +12,8 @@ interface Props {
 
 export default function DealRow({ deal, onChoose, onViewDetails }: Props) {
   const provider = PROVIDERS[deal.provider];
+  const price = currentMonthlyPrice(deal);
+  const rise = nextPriceRise(deal);
 
   return (
     <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-5">
@@ -18,36 +21,44 @@ export default function DealRow({ deal, onChoose, onViewDetails }: Props) {
         <div className="flex items-center gap-3 min-w-[220px]">
           <ProviderLogo provider={deal.provider} size={36} />
           <div>
-            <h4 className="font-bold">{deal.planName}</h4>
-            <p className="text-xs text-gray-500">
-              {provider.name} · {deal.connection}
-            </p>
+            <h4 className="font-bold">{deal.name}</h4>
+            <p className="text-xs text-gray-500">{provider.name}</p>
           </div>
         </div>
 
-        <span className="inline-flex items-center gap-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 rounded-full px-3 py-1 w-fit">
-          🎁 {incentiveLabel(deal)}
-        </span>
+        {deal.reward && (
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 rounded-full px-3 py-1 w-fit">
+            🎁 {deal.reward}
+          </span>
+        )}
 
         <div className="flex gap-8 flex-1">
           <div>
             <p className="text-xs text-gray-400">Speed</p>
-            <p className="font-semibold">{deal.speedMbps}mb</p>
+            <p className="font-semibold">{formatSpeed(deal.download_mbps, deal.download_note)}</p>
           </div>
           <div>
             <p className="text-xs text-gray-400">Monthly price</p>
-            <p className="font-semibold">{formatPrice(deal.priceMonthly)}</p>
+            <p className="font-semibold">{formatPrice(price)}</p>
           </div>
           <div>
             <p className="text-xs text-gray-400">Contract</p>
-            <p className="font-semibold">{deal.contractMonths} months</p>
+            <p className="font-semibold">
+              {deal.contract_months === 1 ? "Rolling monthly" : `${deal.contract_months} months`}
+            </p>
           </div>
         </div>
 
-        {deal.priceFixedForTerm && (
+        {rise ? (
           <span className="text-xs font-medium bg-amber-50 text-amber-700 rounded-full px-3 py-1 w-fit">
-            Price fixed for the term
+            Rises to {formatPrice(rise.monthly_price)}/mo
           </span>
+        ) : (
+          deal.price_rise_note && (
+            <span className="text-xs font-medium bg-amber-50 text-amber-700 rounded-full px-3 py-1 w-fit max-w-[220px]">
+              {deal.price_rise_note}
+            </span>
+          )
         )}
 
         <div className="flex gap-3 lg:ml-auto">

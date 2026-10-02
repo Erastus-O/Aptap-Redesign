@@ -1,4 +1,3 @@
-import { DEALS } from "../data/deals";
 import type { Deal, ProviderSlug } from "../types";
 import { normalizePostcode } from "./address";
 
@@ -9,7 +8,6 @@ export interface Coverage {
   label: string;
   areaType: "Urban" | "Suburban" | "Town" | "Rural";
   hasCable: boolean;
-  hasGigCable: boolean;
   hasFullFibre: boolean;
   maxSpeedMbps: number;
 }
@@ -20,16 +18,14 @@ const COVERAGE_PROFILES: Record<CoverageTier, Coverage> = {
     label: "Full fibre and cable network available",
     areaType: "Urban",
     hasCable: true,
-    hasGigCable: true,
     hasFullFibre: true,
-    maxSpeedMbps: 1130,
+    maxSpeedMbps: 2500,
   },
   "fibre-suburb": {
     tier: "fibre-suburb",
     label: "Full fibre available, no cable network here",
     areaType: "Suburban",
     hasCable: false,
-    hasGigCable: false,
     hasFullFibre: true,
     maxSpeedMbps: 900,
   },
@@ -38,7 +34,6 @@ const COVERAGE_PROFILES: Record<CoverageTier, Coverage> = {
     label: "Cable network available, full fibre not yet rolled out",
     areaType: "Town",
     hasCable: true,
-    hasGigCable: false,
     hasFullFibre: false,
     maxSpeedMbps: 362,
   },
@@ -47,7 +42,6 @@ const COVERAGE_PROFILES: Record<CoverageTier, Coverage> = {
     label: "Standard fibre-to-the-cabinet coverage only",
     areaType: "Rural",
     hasCable: false,
-    hasGigCable: false,
     hasFullFibre: false,
     maxSpeedMbps: 76,
   },
@@ -66,7 +60,10 @@ function hashString(input: string): number {
 
 /** The outward code (e.g. "PE7" from "PE7 8PD") is what actually determines
  *  real-world broadband coverage, so the tier is derived from it rather than
- *  the full postcode. */
+ *  the full postcode. This is a simulated coverage model — the feed itself
+ *  carries no per-address availability data — used only to make the demo
+ *  reflect that real coverage (cable footprint, full-fibre rollout, FTTC-only
+ *  areas) genuinely varies by address. */
 function outwardCode(postcode: string): string {
   const clean = normalizePostcode(postcode).replace(/\s+/g, "");
   return clean.slice(0, Math.max(1, clean.length - 3));
@@ -79,15 +76,13 @@ export function getCoverage(postcode: string): Coverage {
 }
 
 export function isDealAvailable(deal: Deal, coverage: Coverage): boolean {
-  if (deal.speedMbps > coverage.maxSpeedMbps) return false;
-  switch (deal.requiresFootprint) {
-    case "cable-gig":
-      return coverage.hasGigCable;
+  if (deal.download_mbps != null && deal.download_mbps > coverage.maxSpeedMbps) return false;
+  switch (deal.technology) {
     case "cable":
       return coverage.hasCable;
-    case "full-fibre":
+    case "full_fibre":
       return coverage.hasFullFibre;
-    default:
+    case "part_fibre":
       return true;
   }
 }
@@ -97,10 +92,10 @@ export function availableDealsFor(deals: Deal[], postcode: string): Deal[] {
   return deals.filter((d) => isDealAvailable(d, coverage));
 }
 
-export function availableProvidersFor(postcode: string): ProviderSlug[] {
+export function availableProvidersFor(deals: Deal[], postcode: string): ProviderSlug[] {
   const coverage = getCoverage(postcode);
   const slugs = new Set<ProviderSlug>();
-  for (const deal of DEALS) {
+  for (const deal of deals) {
     if (isDealAvailable(deal, coverage)) slugs.add(deal.provider);
   }
   return [...slugs];

@@ -1,6 +1,8 @@
 import type { Deal, RecommendedDeal, RecommendReason } from "../types";
+import { currentMonthlyPrice } from "./price";
 
-function greatForText(speedMbps: number): string {
+function greatForText(speedMbps: number | null): string {
+  if (speedMbps == null) return "Speed varies by address — check the details for this deal.";
   if (speedMbps >= 500) {
     return "Great for a full household streaming in 4K, gaming and working from home at the same time.";
   }
@@ -26,7 +28,9 @@ function reasonText(reason: RecommendReason, deal: Deal, poolSize: number): stri
     case "fastest":
       return "The fastest connection available at your address today.";
     case "flexible":
-      return `Just a ${deal.contractMonths}-month commitment — one of the shortest contracts available here.`;
+      return deal.contract_months === 1
+        ? "Rolling monthly — no fixed-term contract at all."
+        : `Just a ${deal.contract_months}-month commitment — one of the shortest contracts available here.`;
   }
 }
 
@@ -36,7 +40,7 @@ function tag(deal: Deal, reason: RecommendReason, poolSize: number): Recommended
     reasonTag: reason,
     reasonLabel: REASON_LABELS[reason],
     reasonText: reasonText(reason, deal, poolSize),
-    greatFor: greatForText(deal.speedMbps),
+    greatFor: greatForText(deal.download_mbps),
   };
 }
 
@@ -48,9 +52,9 @@ function tag(deal: Deal, reason: RecommendReason, poolSize: number): Recommended
 export function getRecommendations(availableDeals: Deal[]): RecommendedDeal[] {
   const byPlan = new Map<string, Deal>();
   for (const deal of availableDeals) {
-    const key = `${deal.provider}|${deal.planName}`;
+    const key = `${deal.provider}|${deal.name}`;
     const existing = byPlan.get(key);
-    if (!existing || deal.priceMonthly < existing.priceMonthly) byPlan.set(key, deal);
+    if (!existing || currentMonthlyPrice(deal) < currentMonthlyPrice(existing)) byPlan.set(key, deal);
   }
   const pool = [...byPlan.values()];
   if (pool.length === 0) return [];
@@ -62,14 +66,14 @@ export function getRecommendations(availableDeals: Deal[]): RecommendedDeal[] {
     return found;
   }
 
-  const byValue = [...pool].sort(
-    (a, b) => b.speedMbps / b.priceMonthly - a.speedMbps / a.priceMonthly
-  );
+  const valueScore = (d: Deal) => (d.download_mbps ? d.download_mbps / currentMonthlyPrice(d) : 0);
+
+  const byValue = [...pool].sort((a, b) => valueScore(b) - valueScore(a));
   const byFastest = [...pool].sort(
-    (a, b) => b.speedMbps - a.speedMbps || a.priceMonthly - b.priceMonthly
+    (a, b) => (b.download_mbps ?? 0) - (a.download_mbps ?? 0) || currentMonthlyPrice(a) - currentMonthlyPrice(b)
   );
   const byFlexible = [...pool].sort(
-    (a, b) => a.contractMonths - b.contractMonths || a.priceMonthly - b.priceMonthly
+    (a, b) => a.contract_months - b.contract_months || currentMonthlyPrice(a) - currentMonthlyPrice(b)
   );
 
   const results: RecommendedDeal[] = [];
