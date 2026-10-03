@@ -147,6 +147,12 @@ function ListDealCard({ deal, logoSrc, logoFill, onChoose, onDetails, comparing,
   const titleId = `deal-${deal.id}-title`;
   return (
     <article className={cx("ap-deal-card ap-deal-card--list", unavailable && "ap-deal-card--unavailable", className)} style={style} aria-labelledby={titleId}>
+      {(onCompareChange || deal.offer_ends) && !unavailable && (
+        <div className="ap-cluster" style={{ justifyContent: "space-between", marginBottom: "var(--ap-spacing-3)" }}>
+          <CompareToggle deal={deal} comparing={comparing} onCompareChange={onCompareChange} />
+          {deal.offer_ends && <span className="ap-deal-card__offer">Offer ends {new Date(deal.offer_ends).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</span>}
+        </div>
+      )}
       <div className="ap-deal-card__row">
         <div className="ap-deal-card__identity-group">
           <Identity deal={deal} logoSrc={logoSrc} logoFill={logoFill} headingLevel={headingLevel} id={titleId} />
@@ -168,12 +174,6 @@ function ListDealCard({ deal, logoSrc, logoFill, onChoose, onDetails, comparing,
           </>
         )}
       </div>
-      {(onCompareChange || deal.offer_ends) && !unavailable && (
-        <div className="ap-cluster" style={{ justifyContent: "space-between", marginTop: "var(--ap-spacing-3)" }}>
-          <CompareToggle deal={deal} comparing={comparing} onCompareChange={onCompareChange} />
-          {deal.offer_ends && <span className="ap-deal-card__offer">Offer ends {new Date(deal.offer_ends).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</span>}
-        </div>
-      )}
     </article>
   );
 }
