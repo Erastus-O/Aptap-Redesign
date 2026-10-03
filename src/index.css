@@ -109,6 +109,21 @@ body {
   }
 }
 
+/* ---- Hero title: restricted to 2 lines. The stock 16ch cap breaks this
+   headline into 3; widening it lets "Get affordable broadband / deals
+   around you" balance across 2 wherever there's room. On narrow phones the
+   box is too tight for 2 lines at the default display size no matter the
+   max-width, so the title steps down to a smaller size there instead. ---- */
+.ap-hero-search__title {
+  max-width: 26ch;
+}
+@media (max-width: 767px) {
+  .ap-hero-search__title {
+    max-width: 100%;
+    font-size: 24px;
+  }
+}
+
 /* ---- "Why we recommend it": fixed height so the three carousel cards line
    up regardless of how long each reason is; width stays fluid (100% of the
    card), it just no longer grows/shrinks the card's vertical rhythm. ---- */
