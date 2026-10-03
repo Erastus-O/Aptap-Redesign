@@ -42,6 +42,11 @@ body {
   --ap-panel-gap: var(--ap-spacing-3);
   --ap-hero-padding: var(--ap-spacing-6);
   --ap-dealer-tile-padding: var(--ap-spacing-3);
+
+  /* Lighter field labels: the input's own value should be the thing that
+     reads, with the label as a quiet, muted hint above it rather than
+     competing with headings at full content-primary contrast. */
+  --ap-input-label: var(--ap-color-content-secondary);
 }
 @media (min-width: 768px) {
   :root {
