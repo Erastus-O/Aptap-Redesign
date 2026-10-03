@@ -857,7 +857,7 @@
 .ap-deal-card--list .ap-deal-card__actions { flex-direction: row; flex-wrap: wrap; }
 .ap-deal-card--list .ap-deal-card__actions > .ap-btn { flex: 1 1 140px; }
 @container (min-width: 720px) {
-  .ap-deal-card__row { display: grid; grid-template-columns: minmax(180px, 1.3fr) minmax(260px, 2fr) auto; align-items: center; gap: var(--ap-spacing-5); }
+  .ap-deal-card__row { display: grid; grid-template-columns: minmax(230px, 1.6fr) minmax(240px, 1.8fr) auto; align-items: start; gap: var(--ap-spacing-5); }
   .ap-deal-card--list .ap-deal-card__actions { flex-wrap: nowrap; }
   .ap-deal-card--list .ap-deal-card__actions > .ap-btn { flex: 0 0 auto; }
 }
