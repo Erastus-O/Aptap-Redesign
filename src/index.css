@@ -18,3 +18,68 @@ body {
 * {
   box-sizing: border-box;
 }
+
+/* ==========================================================================
+   App-level overrides on top of @aptap/design-system.
+   These are deliberately unlayered (not wrapped in @layer), so they take
+   priority over the design system's `@layer ap-components` rules regardless
+   of source order or specificity — the standard CSS cascade-layer behaviour:
+   an unlayered declaration always wins over a layered one.
+   ========================================================================== */
+
+/* ---- Compact density pass: the stock desktop scale-up (48px display type,
+   48px section gaps, 24-32px page margins) read as too spacious for a
+   glanceable deals list. Override the component-layer tokens the design
+   system itself exposes for exactly this kind of app-level tuning, rather
+   than hand-editing every rule that consumes them. ---- */
+:root {
+  --ap-space-inset-card: var(--ap-spacing-4);
+  --ap-space-inset-panel: var(--ap-spacing-5);
+  --ap-space-stack-md: var(--ap-spacing-3);
+  --ap-space-stack-lg: var(--ap-spacing-4);
+  --ap-space-stack-section: var(--ap-spacing-5);
+  --ap-space-page-margin: var(--ap-spacing-4);
+  --ap-panel-gap: var(--ap-spacing-3);
+  --ap-hero-padding: var(--ap-spacing-6);
+  --ap-dealer-tile-padding: var(--ap-spacing-3);
+}
+@media (min-width: 768px) {
+  :root {
+    --ap-type-display-size: var(--ap-font-size-4xl);
+    --ap-type-h1-size: var(--ap-font-size-lg);
+    --ap-type-h2-size: var(--ap-font-size-lg);
+    --ap-space-inset-card: var(--ap-spacing-4);
+    --ap-space-stack-section: var(--ap-spacing-6);
+    --ap-space-page-margin: var(--ap-spacing-5);
+  }
+}
+@media (min-width: 1200px) {
+  :root {
+    --ap-space-page-margin: var(--ap-spacing-6);
+  }
+}
+
+.ap-dealer-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(110px, 40%), 1fr));
+}
+
+/* ---- Hero: darker, more purple glow (ApTap's own gradient tokens — no new
+   hardcoded colors), replacing the stock blue-leaning two-blob glow. ---- */
+.ap-hero-search::before {
+  background:
+    radial-gradient(70% 60% at 12% -10%, color-mix(in srgb, var(--ap-color-primary-600) 42%, transparent), transparent 70%),
+    radial-gradient(55% 50% at 100% 100%, color-mix(in srgb, var(--ap-color-accent) 22%, transparent), transparent 70%),
+    linear-gradient(155deg, color-mix(in srgb, var(--ap-color-primary-600) 22%, transparent) 0%, transparent 50%);
+}
+
+/* ---- "Why we recommend it": fixed height so the three carousel cards line
+   up regardless of how long each reason is; width stays fluid (100% of the
+   card), it just no longer grows/shrinks the card's vertical rhythm. ---- */
+.ap-deal-card__why {
+  width: 100%;
+  height: var(--ap-spacing-16);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
