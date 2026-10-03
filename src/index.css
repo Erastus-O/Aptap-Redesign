@@ -70,7 +70,13 @@ body {
 }
 @media (min-width: 1200px) {
   :root {
-    --ap-space-page-margin: var(--ap-spacing-10);
+    --ap-space-page-margin: var(--ap-spacing-16);
+    /* Narrower content column (1200px stock → 1040px) so the page reads as
+       a centred card floating in generous whitespace on wide screens,
+       instead of the margin/padding split cancelling out at a fixed total
+       width — reducing the content width is what actually grows the
+       visible gutter once the container is past its max-width. */
+    --ap-container-desktop: 1040px;
   }
 }
 
