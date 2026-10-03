@@ -1,5 +1,9 @@
 import bt from "../assets/logos/bt.jpg";
 import hyperoptic from "../assets/logos/hyperoptic.png";
+import plusnet from "../assets/logos/plusnet.png";
+import sky from "../assets/logos/sky.jpg";
+import virginMedia from "../assets/logos/virgin-media.webp";
+import vodafone from "../assets/logos/vodafone.png";
 import type { Provider, ProviderSlug } from "../types";
 
 export const PROVIDERS: Record<ProviderSlug, Provider> = {
@@ -21,6 +25,10 @@ export const PROVIDER_LIST = Object.values(PROVIDERS);
 const PROVIDER_LOGOS: Partial<Record<ProviderSlug, { src: string; fill: boolean }>> = {
   BT: { src: bt, fill: true },
   Hyperoptic: { src: hyperoptic, fill: false },
+  Sky: { src: sky, fill: false },
+  "Virgin Media": { src: virginMedia, fill: false },
+  Vodafone: { src: vodafone, fill: false },
+  Plusnet: { src: plusnet, fill: false },
 };
 
 export function providerLogo(slug: ProviderSlug): { src?: string; fill?: boolean } {
