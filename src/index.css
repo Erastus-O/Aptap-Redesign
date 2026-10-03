@@ -33,20 +33,28 @@ body {
    system itself exposes for exactly this kind of app-level tuning, rather
    than hand-editing every rule that consumes them. ---- */
 :root {
+  /* All spacing below is pinned to multiples of 8px (spacing-2=8, spacing-4=16,
+     spacing-6=24, spacing-8=32…) rather than the design system's in-between
+     steps (spacing-3=12, spacing-5=20), for a consistent 8px rhythm. */
   --ap-space-inset-card: var(--ap-spacing-4);
-  --ap-space-inset-panel: var(--ap-spacing-5);
-  --ap-space-stack-md: var(--ap-spacing-3);
+  --ap-space-inset-panel: var(--ap-spacing-4);
+  --ap-space-stack-md: var(--ap-spacing-2);
   --ap-space-stack-lg: var(--ap-spacing-4);
-  --ap-space-stack-section: var(--ap-spacing-5);
+  --ap-space-stack-section: var(--ap-spacing-4);
   --ap-space-page-margin: var(--ap-spacing-4);
-  --ap-panel-gap: var(--ap-spacing-3);
+  --ap-panel-gap: var(--ap-spacing-2);
   --ap-hero-padding: var(--ap-spacing-6);
-  --ap-dealer-tile-padding: var(--ap-spacing-3);
+  --ap-dealer-tile-padding: var(--ap-spacing-2);
 
   /* Lighter field labels: the input's own value should be the thing that
      reads, with the label as a quiet, muted hint above it rather than
      competing with headings at full content-primary contrast. */
   --ap-input-label: var(--ap-color-content-secondary);
+
+  /* Body text at 14px. Inputs are explicitly kept at 16px further down —
+     that's the line that stops iOS Safari zooming the page on focus inside
+     a webview, so it can't shrink with the rest of the body copy. */
+  --ap-type-body-md-size: var(--ap-font-size-sm);
 }
 @media (min-width: 768px) {
   :root {
@@ -55,13 +63,17 @@ body {
     --ap-type-h2-size: var(--ap-font-size-lg);
     --ap-space-inset-card: var(--ap-spacing-4);
     --ap-space-stack-section: var(--ap-spacing-6);
-    --ap-space-page-margin: var(--ap-spacing-5);
+    --ap-space-page-margin: var(--ap-spacing-4);
   }
 }
 @media (min-width: 1200px) {
   :root {
     --ap-space-page-margin: var(--ap-spacing-6);
   }
+}
+
+.ap-input, .ap-select, .ap-textarea {
+  font-size: var(--ap-font-size-md);
 }
 
 /* auto-fit (not auto-fill): collapses empty tracks so the tiles actually
@@ -131,6 +143,18 @@ body {
     max-width: 100%;
     font-size: 24px;
   }
+}
+
+/* ---- Deal logo icons: 80×80, scoped to the Identity pattern (deal cards,
+   deal details hero, selected-deal summary) rather than every Avatar in the
+   app — DealerTile (Home) and CompareTable keep their own smaller sizes,
+   which suit those denser layouts. ---- */
+.ap-identity .ap-avatar {
+  width: 80px;
+  height: 80px;
+}
+.ap-identity .ap-avatar__fallback {
+  font-size: var(--ap-type-h3-size);
 }
 
 /* ---- "Why we recommend it": fixed height so the three carousel cards line

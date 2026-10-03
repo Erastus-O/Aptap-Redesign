@@ -148,7 +148,7 @@ function ListDealCard({ deal, logoSrc, logoFill, onChoose, onDetails, comparing,
   return (
     <article className={cx("ap-deal-card ap-deal-card--list", unavailable && "ap-deal-card--unavailable", className)} style={style} aria-labelledby={titleId}>
       {(onCompareChange || deal.offer_ends) && !unavailable && (
-        <div className="ap-cluster" style={{ justifyContent: "space-between", marginBottom: "var(--ap-spacing-3)" }}>
+        <div className="ap-cluster" style={{ justifyContent: "space-between", marginBottom: "var(--ap-spacing-2)" }}>
           <CompareToggle deal={deal} comparing={comparing} onCompareChange={onCompareChange} />
           {deal.offer_ends && <span className="ap-deal-card__offer">Offer ends {new Date(deal.offer_ends).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</span>}
         </div>

@@ -335,5 +335,5 @@ export default function Switch() {
 }
 
 function Field2Row({ children }: { children: React.ReactNode }) {
-  return <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--ap-spacing-3)" }}>{children}</div>;
+  return <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--ap-spacing-4)" }}>{children}</div>;
 }
