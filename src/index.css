@@ -84,6 +84,12 @@ body {
   gap: var(--ap-spacing-4);
 }
 
+/* ---- Dealer tile: tighter gap between the logo, name and "View deals"
+   button (12px stock → 8px). ---- */
+.ap-dealer-tile {
+  gap: var(--ap-spacing-2);
+}
+
 /* ---- Dealer tile name: reserve 2 lines of height so a longer provider name
    (e.g. "Virgin Media") that wraps doesn't push its "View deals" button out
    of line with the single-line names next to it in the grid row. ---- */
