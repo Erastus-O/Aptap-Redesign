@@ -892,7 +892,7 @@
   .ap-deal-card--list .ap-deal-card__actions { flex-wrap: nowrap; }
   .ap-deal-card--list .ap-deal-card__actions > .ap-btn { flex: 0 0 150px; }
 }
-.ap-deal-card__meta-pills { display: flex; flex-wrap: wrap; gap: var(--ap-spacing-2); }
+.ap-deal-card__meta-pills { display: flex; flex-direction: column; align-items: flex-start; gap: var(--ap-spacing-2); }
 
 /* Shared states */
 .ap-deal-card--unavailable { box-shadow: none; }
