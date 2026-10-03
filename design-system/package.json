@@ -1,0 +1,12 @@
+{
+  "name": "@aptap/design-system",
+  "version": "1.1.0",
+  "private": true,
+  "description": "ApTap design system — tokens, CSS components and React components for the broadband switching journey.",
+  "type": "module",
+  "main": "src/index.ts",
+  "files": ["dist", "src", "tokens", "assets", "docs"],
+  "peerDependencies": {
+    "react": ">=18"
+  }
+}

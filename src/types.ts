@@ -36,6 +36,10 @@ export interface Deal {
   reward: string | null;
   offer_ends: string | null;
   source_url: string;
+  /** Set only when the provider explicitly guarantees no mid-contract rise. Never inferred. */
+  price_fixed?: boolean;
+  /** Licensed, current review data only. Never estimated — omitted entirely when the feed doesn't publish one. */
+  rating?: { score: number; count: number; source: string };
 }
 
 export interface DealsFeed {

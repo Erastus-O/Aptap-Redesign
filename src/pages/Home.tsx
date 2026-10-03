@@ -1,9 +1,9 @@
+import { AddressPicker, DealerTile, HeroSearch, Panel } from "@aptap/design-system";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
-import ProviderLogo from "../components/ProviderLogo";
-import { PROVIDER_LIST } from "../data/providers";
-import { findAddresses, isLikelyPostcode } from "../lib/address";
+import { PROVIDER_LIST, providerLogo } from "../data/providers";
+import { findAddresses } from "../lib/address";
 import { availableProvidersFor } from "../lib/availability";
 import { useAppState } from "../store/AppState";
 import type { ProviderSlug } from "../types";
@@ -11,34 +11,22 @@ import type { ProviderSlug } from "../types";
 export default function Home() {
   const navigate = useNavigate();
   const { state, deals, setPostcodeSearch, selectAddress, setProviders, setOnlyProvider } = useAppState();
-  const [postcodeInput, setPostcodeInput] = useState(state.postcode);
-  const [error, setError] = useState<string | null>(null);
   const [showResults, setShowResults] = useState(state.addresses.length > 0);
-  const [checkingAddress, setCheckingAddress] = useState<string | null>(null);
 
-  function handleCheckAvailability(e: React.FormEvent) {
-    e.preventDefault();
-    if (!isLikelyPostcode(postcodeInput)) {
-      setError("Enter a full postcode, e.g. PE7 8PD");
-      return;
-    }
-    setError(null);
-    const addresses = findAddresses(postcodeInput);
-    setPostcodeSearch(postcodeInput, addresses);
+  function handleSearch(postcode: string) {
+    const addresses = findAddresses(postcode);
+    setPostcodeSearch(postcode, addresses);
     setShowResults(true);
   }
 
   function handleSelectAddress(address: string) {
-    setCheckingAddress(address);
-    window.setTimeout(() => {
-      selectAddress(address);
-      setProviders(availableProvidersFor(deals.deals, state.postcode));
-      navigate("/deals");
-    }, 700);
+    selectAddress(address);
+    setProviders(availableProvidersFor(deals.deals, state.postcode));
+    navigate("/deals");
   }
 
   function handleViewProviderDeals(slug: ProviderSlug) {
-    const fallbackPostcode = state.selectedAddress ? state.postcode : postcodeInput || "PE7 8PD";
+    const fallbackPostcode = state.selectedAddress ? state.postcode : "PE7 8PD";
     if (!state.selectedAddress) {
       const addresses = findAddresses(fallbackPostcode);
       setPostcodeSearch(fallbackPostcode, addresses);
@@ -49,125 +37,55 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div>
       <Header />
 
-      <section className="mx-auto max-w-[1728px] px-6 pt-8">
-        <div className="relative overflow-hidden rounded-3xl bg-[#0b0b12] px-10 py-14 text-white">
-          <div
-            className="pointer-events-none absolute inset-0 opacity-70"
-            style={{
-              background:
-                "radial-gradient(60% 80% at 20% 30%, rgba(99,102,241,0.35), transparent 60%), radial-gradient(50% 70% at 80% 20%, rgba(6,182,212,0.3), transparent 55%), radial-gradient(60% 60% at 60% 90%, rgba(236,72,153,0.25), transparent 60%)",
-            }}
-          />
-          <div className="relative">
-            <p className="text-sm font-medium text-gray-300 mb-3">Broadband marketplace</p>
-            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight max-w-2xl">
-              Get affordable broadband deals around you
-            </h1>
-            <p className="mt-4 text-gray-300 max-w-xl">
-              Grab superfast, reliable broadband packages that best fits your need
+      <div className="ap-container" style={{ paddingTop: "var(--ap-spacing-6)" }}>
+        <HeroSearch
+          title="Get affordable broadband deals around you"
+          lede="Grab superfast, reliable broadband packages that best fit your need"
+          initialPostcode={state.postcode}
+          onSearch={handleSearch}
+        >
+          {deals.error && (
+            <p className="ap-hero-search__lede" role="alert">
+              We couldn't load today's deals ({deals.error}). Try refreshing the page.
             </p>
+          )}
+        </HeroSearch>
 
-            <form
-              onSubmit={handleCheckAvailability}
-              className="mt-8 flex flex-col sm:flex-row gap-3 bg-white rounded-2xl sm:rounded-full p-2 shadow-xl max-w-3xl"
-            >
-              <input
-                value={postcodeInput}
-                onChange={(e) => setPostcodeInput(e.target.value)}
-                placeholder="Enter your postcode"
-                className="flex-1 px-4 py-3 rounded-full text-gray-900 placeholder:text-gray-400 outline-none"
-                aria-label="Postcode"
-              />
-              <button
-                type="submit"
-                className="px-6 py-3 rounded-full bg-indigo-600 hover:bg-indigo-700 transition-colors text-white font-semibold whitespace-nowrap"
-              >
-                Check for availability
-              </button>
-            </form>
-            {error && <p className="mt-2 text-sm text-rose-300">{error}</p>}
-            {deals.error && (
-              <p className="mt-2 text-sm text-rose-300">
-                We couldn't load today's deals ({deals.error}). Try refreshing the page.
-              </p>
-            )}
-
-            {showResults && state.addresses.length > 0 && (
-              <div className="mt-6 max-w-3xl rounded-2xl bg-white text-gray-900 shadow-2xl overflow-hidden">
-                <div className="flex items-start justify-between px-6 py-4 border-b border-gray-100">
-                  <div>
-                    <h2 className="font-bold text-lg">Select address</h2>
-                    <p className="text-sm text-gray-500">
-                      {state.addresses.length} addresses found around {state.postcode.toUpperCase()}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setShowResults(false)}
-                    aria-label="Close address results"
-                    className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50"
-                  >
-                    ✕
-                  </button>
-                </div>
-                <ul>
-                  {state.addresses.map((address) => {
-                    const isChecking = checkingAddress === address;
-                    return (
-                      <li key={address} className="border-b border-gray-50 last:border-0">
-                        <button
-                          onClick={() => handleSelectAddress(address)}
-                          disabled={checkingAddress !== null}
-                          className="w-full flex items-center justify-between text-left px-6 py-4 hover:bg-indigo-50 transition-colors disabled:cursor-wait disabled:hover:bg-transparent"
-                        >
-                          <span className={isChecking ? "text-gray-400" : undefined}>{address}</span>
-                          {isChecking && (
-                            <span className="flex items-center gap-2 text-xs font-medium text-indigo-600">
-                              <span
-                                className="w-3.5 h-3.5 rounded-full border-2 border-indigo-200 border-t-indigo-600 animate-spin"
-                                aria-hidden
-                              />
-                              Checking your line...
-                            </span>
-                          )}
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            )}
+        {showResults && state.addresses.length > 0 && (
+          <div style={{ marginTop: "var(--ap-spacing-5)" }}>
+            <AddressPicker
+              postcode={state.postcode.toUpperCase()}
+              addresses={state.addresses}
+              onSelect={handleSelectAddress}
+              onClose={() => setShowResults(false)}
+            />
           </div>
-        </div>
-      </section>
+        )}
+      </div>
 
-      <section className="mx-auto max-w-[1728px] px-6 py-10">
-        <div className="rounded-3xl bg-white shadow-sm p-8">
-          <h2 className="text-2xl font-extrabold">Top dealers</h2>
-          <p className="text-gray-500 mt-1">View several broadband deal offerings from our top dealers</p>
-          <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            {PROVIDER_LIST.map((provider) => (
-              <div
-                key={provider.slug}
-                className="rounded-2xl border border-gray-100 p-5 flex flex-col items-center gap-3 text-center hover:shadow-md transition-shadow"
-              >
-                <ProviderLogo provider={provider.slug} size={56} />
-                <span className="font-semibold">{provider.name}</span>
-                <button
-                  onClick={() => handleViewProviderDeals(provider.slug)}
-                  disabled={deals.loading}
-                  className="w-full py-2.5 rounded-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-wait transition-colors text-white text-sm font-semibold"
-                >
-                  {deals.loading ? "Loading…" : "View deals"}
-                </button>
-              </div>
-            ))}
+      <div className="ap-container" style={{ paddingBlock: "var(--ap-spacing-8)" }}>
+        <Panel title="Top dealers" subtitle="View several broadband deal offerings from our top dealers">
+          <div className="ap-dealer-grid">
+            {PROVIDER_LIST.map((provider) => {
+              const logo = providerLogo(provider.slug);
+              return (
+                <DealerTile
+                  key={provider.slug}
+                  provider={provider.name}
+                  logoSrc={logo.src}
+                  logoFill={logo.fill}
+                  onView={() => handleViewProviderDeals(provider.slug)}
+                />
+              );
+            })}
           </div>
           {deals.updatedAt && (
-            <p className="text-xs text-gray-400 mt-6">
-              Deals checked {new Date(deals.updatedAt).toLocaleDateString("en-GB", {
+            <p className="ap-footnote" style={{ marginTop: "var(--ap-spacing-6)" }}>
+              Deals checked{" "}
+              {new Date(deals.updatedAt).toLocaleDateString("en-GB", {
                 day: "numeric",
                 month: "long",
                 year: "numeric",
@@ -176,8 +94,8 @@ export default function Home() {
               your address. TalkTalk and Community Fibre aren't included yet.
             </p>
           )}
-        </div>
-      </section>
+        </Panel>
+      </div>
     </div>
   );
 }

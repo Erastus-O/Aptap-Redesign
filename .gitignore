@@ -8,9 +8,12 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
-dist
+/dist
 dist-ssr
 *.local
+
+# design-system/dist is checked-in source (compiled tokens/CSS), not a build artifact
+!design-system/dist
 
 # Editor directories and files
 .vscode/*

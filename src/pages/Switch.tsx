@@ -1,10 +1,20 @@
+import {
+  Alert,
+  Button,
+  Checkbox,
+  Icons,
+  Panel,
+  SegmentedControl,
+  SelectField,
+  SelectedDeal,
+  StepProgress,
+  TextField,
+} from "@aptap/design-system";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
-import ProviderLogo from "../components/ProviderLogo";
-import { PROVIDER_LIST, PROVIDERS } from "../data/providers";
-import { currentYearOptions, formatPrice, isMoreThan30DaysOut, MONTHS } from "../lib/format";
-import { currentMonthlyPrice, formatContract, formatSpeed, technologyLabel } from "../lib/price";
+import { PROVIDER_LIST, PROVIDERS, providerLogo } from "../data/providers";
+import { currentYearOptions, isMoreThan30DaysOut, MONTHS } from "../lib/format";
 import { useAppState } from "../store/AppState";
 
 const STEP_LABELS = ["Your current setup", "Contact & install", "Review & confirm"];
@@ -24,6 +34,7 @@ export default function Switch() {
   if (!deal) return null;
 
   const provider = PROVIDERS[deal.provider];
+  const logo = providerLogo(deal.provider);
   const step = state.switchStep;
   const form = state.switchForm;
 
@@ -52,47 +63,56 @@ export default function Switch() {
 
   if (step === 4) {
     return (
-      <div className="min-h-screen bg-gray-100">
+      <div>
         <Header />
-        <div className="mx-auto max-w-2xl px-6 py-16">
-          <div className="rounded-2xl bg-white shadow-sm p-10 text-center">
-            <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-3xl mx-auto mb-5">
-              ✓
+        <div className="ap-container ap-container--reading" style={{ paddingBlock: "var(--ap-spacing-10)" }}>
+          <div className="ap-panel" style={{ textAlign: "center" }}>
+            <div
+              className="ap-avatar ap-avatar--lg"
+              style={{ margin: "0 auto var(--ap-spacing-4)", color: "var(--ap-color-content-success, green)" }}
+              aria-hidden="true"
+            >
+              <Icons.CheckCircle size="xl" />
             </div>
-            <h1 className="text-2xl font-extrabold mb-2">You're all set, {form.fullName.split(" ")[0]}!</h1>
-            <p className="text-gray-500 mb-6">
+            <h1 className="ap-text-h2">You're all set, {form.fullName.split(" ")[0]}!</h1>
+            <p className="ap-muted">
               We've started your switch to {provider.name} {deal.name}. Your reference number is{" "}
-              <span className="font-semibold text-gray-800">{reference}</span>.
+              <strong>{reference}</strong>.
             </p>
-            <div className="rounded-xl bg-gray-50 p-5 text-left mb-8">
-              <p className="text-sm text-gray-500 mb-1">Installation preference</p>
-              <p className="font-semibold mb-4">
-                {form.preferredInstallDate} · {form.preferredInstallSlot}
-              </p>
-              <p className="text-sm text-gray-500 mb-1">We'll contact you at</p>
-              <p className="font-semibold">
-                {form.email} · {form.phone}
-              </p>
+            <div className="ap-inset" style={{ textAlign: "left", margin: "var(--ap-spacing-6) 0" }}>
+              <dl className="ap-kv">
+                <div>
+                  <dt>Installation preference</dt>
+                  <dd>
+                    {form.preferredInstallDate} · {form.preferredInstallSlot}
+                  </dd>
+                </div>
+                <div>
+                  <dt>We'll contact you at</dt>
+                  <dd>
+                    {form.email} · {form.phone}
+                  </dd>
+                </div>
+              </dl>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <button
+            <div className="ap-cluster" style={{ justifyContent: "center" }}>
+              <Button
+                variant="secondary"
                 onClick={() => {
                   resetSwitchFlow();
                   navigate("/deals");
                 }}
-                className="px-6 py-3 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors font-medium"
               >
                 Browse more deals
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => {
                   resetSwitchFlow();
                   navigate("/");
                 }}
-                className="px-6 py-3 rounded-full bg-indigo-600 hover:bg-indigo-700 transition-colors text-white font-semibold"
               >
                 Back to marketplace
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -101,324 +121,219 @@ export default function Switch() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div>
       <Header />
-      <div className="mx-auto max-w-2xl px-6 py-10">
-        <div className="rounded-2xl bg-white shadow-sm p-6 mb-6">
-          <p className="text-xs font-bold tracking-wide text-gray-400 mb-4">SELECTED BROADBAND</p>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <ProviderLogo provider={deal.provider} size={40} />
-              <div>
-                <h2 className="font-bold text-lg leading-tight">{deal.name}</h2>
-                <p className="text-sm text-gray-500">
-                  {provider.name} · {technologyLabel(deal.technology)}
-                </p>
-              </div>
-              {deal.reward && (
-                <span className="inline-flex items-center gap-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 rounded-full px-3 py-1">
-                  🎁 {deal.reward}
-                </span>
-              )}
-            </div>
-            <button
-              onClick={() => {
-                resetSwitchFlow();
-                navigate("/deals");
-              }}
-              className="px-4 py-2.5 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors font-medium text-sm w-fit"
-            >
-              Change deal
-            </button>
-          </div>
-          <div className="flex gap-10 mt-4">
-            <div>
-              <p className="text-xs text-gray-400">Speed</p>
-              <p className="font-semibold">{formatSpeed(deal.download_mbps, deal.download_note)}</p>
-            </div>
-            <div>
-              <p className="text-xs text-gray-400">Monthly price</p>
-              <p className="font-semibold">{formatPrice(currentMonthlyPrice(deal))}</p>
-            </div>
-            <div>
-              <p className="text-xs text-gray-400">Contract</p>
-              <p className="font-semibold">{formatContract(deal.contract_months)}</p>
-            </div>
-          </div>
-        </div>
+      <div className="ap-container ap-container--reading" style={{ paddingBlock: "var(--ap-spacing-8)" }}>
+        <div className="ap-stack ap-stack--section">
+          <SelectedDeal
+            deal={deal}
+            logoSrc={logo.src}
+            logoFill={logo.fill}
+            onChange={() => {
+              resetSwitchFlow();
+              navigate("/deals");
+            }}
+          />
 
-        <div className="rounded-2xl bg-white shadow-sm p-6">
-          <h1 className="text-xl font-extrabold mb-1">Let's get you that Broadband deal</h1>
-          <p className="text-gray-500 text-sm mb-5">
-            You've picked {provider.name} {deal.name}. {formatPrice(currentMonthlyPrice(deal))}/month. We
-            just need to confirm your current setup
-          </p>
+          <Panel>
+            <h1 className="ap-text-h3">Let's get you that broadband deal</h1>
+            <p className="ap-muted">
+              You've picked {provider.name} {deal.name}. We just need to confirm your current setup.
+            </p>
+            <StepProgress current={step} total={3} label={STEP_LABELS[step - 1]} />
 
-          <p className="text-sm font-semibold mb-2">
-            Step {step} of 3 <span className="text-gray-400 font-normal">— {STEP_LABELS[step - 1]}</span>
-          </p>
-          <div className="flex gap-2 mb-8">
-            {[1, 2, 3].map((s) => (
-              <div
-                key={s}
-                className={`h-1.5 flex-1 rounded-full ${s <= step ? "bg-[#0b0b12]" : "bg-gray-200"}`}
-              />
-            ))}
-          </div>
-
-          {step === 1 && (
-            <div className="flex flex-col gap-5">
-              <div>
-                <label className="block text-sm font-semibold mb-2">Confirm your Fullname</label>
-                <input
+            {step === 1 && (
+              <div className="ap-stack">
+                <TextField
+                  label="Confirm your full name"
+                  placeholder="Enter your full name as it is on the bill"
                   value={form.fullName}
                   onChange={(e) => updateSwitchForm({ fullName: e.target.value })}
-                  placeholder="Enter your fullname as it is on the bill"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-indigo-400"
+                  error={errors.fullName}
                 />
-                {errors.fullName && <p className="text-xs text-rose-600 mt-1">{errors.fullName}</p>}
-              </div>
 
-              <div>
-                <label className="block text-sm font-semibold mb-2">Who's your broadband with now?</label>
-                <select
+                <SelectField
+                  label="Who's your broadband with now?"
+                  placeholder="Select your current provider"
                   value={form.currentProvider}
                   onChange={(e) => updateSwitchForm({ currentProvider: e.target.value as never })}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-indigo-400 bg-white"
-                >
-                  <option value="">Select your current provider</option>
-                  {PROVIDER_LIST.map((p) => (
-                    <option key={p.slug} value={p.slug}>
-                      {p.name}
-                    </option>
-                  ))}
-                  <option value="other">Someone else / no broadband</option>
-                  <option value="not_sure">Not sure</option>
-                </select>
-              </div>
+                  options={[
+                    ...PROVIDER_LIST.map((p) => ({ value: p.slug, label: p.name })),
+                    { value: "other", label: "Someone else / no broadband" },
+                    { value: "not_sure", label: "Not sure" },
+                  ]}
+                />
 
-              <div>
-                <label className="block text-sm font-semibold mb-2">When does your contract end?</label>
-                <div className="grid grid-cols-2 gap-3">
-                  <select
+                <Field2Row>
+                  <SelectField
+                    label="Contract end month"
+                    placeholder="Month"
                     value={form.contractEndMonth}
                     onChange={(e) => updateSwitchForm({ contractEndMonth: e.target.value })}
-                    className="px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-indigo-400 bg-white"
-                  >
-                    <option value="">Month</option>
-                    {MONTHS.map((m) => (
-                      <option key={m} value={m}>
-                        {m}
-                      </option>
-                    ))}
-                    <option value="not_sure">Not sure</option>
-                  </select>
-                  <select
+                    options={[...MONTHS.map((m) => ({ value: m, label: m })), { value: "not_sure", label: "Not sure" }]}
+                  />
+                  <SelectField
+                    label="Contract end year"
+                    placeholder="Year"
                     value={form.contractEndYear}
                     onChange={(e) => updateSwitchForm({ contractEndYear: e.target.value })}
-                    className="px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-indigo-400 bg-white"
-                  >
-                    <option value="">Year</option>
-                    {currentYearOptions().map((y) => (
-                      <option key={y} value={y}>
-                        {y}
-                      </option>
-                    ))}
-                    <option value="not_sure">Not sure</option>
-                  </select>
-                </div>
-              </div>
+                    options={[...currentYearOptions().map((y) => ({ value: y, label: y })), { value: "not_sure", label: "Not sure" }]}
+                  />
+                </Field2Row>
 
-              {isMoreThan30DaysOut(form.contractEndMonth, form.contractEndYear) && (
-                <div className="rounded-xl bg-amber-50 border border-amber-100 px-4 py-3 flex items-start gap-2.5">
-                  <span aria-hidden className="text-base leading-none mt-0.5">
-                    ⚠️
-                  </span>
-                  <p className="text-sm text-amber-900">
+                {isMoreThan30DaysOut(form.contractEndMonth, form.contractEndYear) && (
+                  <Alert tone="warning" live>
                     You may still be in contract until {form.contractEndMonth} {form.contractEndYear}. We'll
                     confirm this with you before you commit — it won't stop you from continuing now.
-                  </p>
-                </div>
-              )}
+                  </Alert>
+                )}
 
-              <p className="text-xs text-gray-400 border-t border-gray-100 pt-4">
-                We would check if you're free to switch without an exit fee. If you're still in contract,
-                we'll tell you before you commit, this won't stop you from continuing now
-              </p>
+                <p className="ap-footnote">
+                  We'll check if you're free to switch without an exit fee. If you're still in contract, we'll
+                  tell you before you commit — this won't stop you from continuing now.
+                </p>
 
-              <button
-                onClick={() => validateStep1() && goToStep(2)}
-                className="w-full py-3.5 rounded-full bg-indigo-600 hover:bg-indigo-700 transition-colors text-white font-semibold"
-              >
-                Proceed to switch deal
-              </button>
-              <p className="text-center text-xs text-gray-400">Your details are only used to process this switch</p>
-            </div>
-          )}
+                <Button block onClick={() => validateStep1() && goToStep(2)}>
+                  Proceed to switch deal
+                </Button>
+                <p className="ap-footnote ap-footnote--center">Your details are only used to process this switch</p>
+              </div>
+            )}
 
-          {step === 2 && (
-            <div className="flex flex-col gap-5">
-              <div>
-                <label className="block text-sm font-semibold mb-2">Email address</label>
-                <input
+            {step === 2 && (
+              <div className="ap-stack">
+                <TextField
+                  label="Email address"
                   type="email"
+                  placeholder="you@example.com"
                   value={form.email}
                   onChange={(e) => updateSwitchForm({ email: e.target.value })}
-                  placeholder="you@example.com"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-indigo-400"
+                  error={errors.email}
                 />
-                {errors.email && <p className="text-xs text-rose-600 mt-1">{errors.email}</p>}
-              </div>
 
-              <div>
-                <label className="block text-sm font-semibold mb-2">Phone number</label>
-                <input
+                <TextField
+                  label="Phone number"
+                  placeholder="07123 456789"
                   value={form.phone}
                   onChange={(e) => updateSwitchForm({ phone: e.target.value })}
-                  placeholder="07123 456789"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-indigo-400"
+                  error={errors.phone}
                 />
-                {errors.phone && <p className="text-xs text-rose-600 mt-1">{errors.phone}</p>}
-              </div>
 
-              <div>
-                <label className="block text-sm font-semibold mb-2">Installation address</label>
-                <div className="flex items-center justify-between px-4 py-3 rounded-xl border border-gray-200 bg-gray-50">
-                  <span className="text-sm">{state.selectedAddress}</span>
-                  <label className="flex items-center gap-2 text-xs text-gray-500 cursor-pointer">
-                    <input
-                      type="checkbox"
+                <div className="ap-field">
+                  <span className="ap-field__label">Installation address</span>
+                  <div className="ap-cluster" style={{ justifyContent: "space-between" }}>
+                    <span>{state.selectedAddress}</span>
+                    <Checkbox
+                      label="This is correct"
                       checked={form.installAddressConfirmed}
                       onChange={(e) => updateSwitchForm({ installAddressConfirmed: e.target.checked })}
-                      className="w-4 h-4 rounded accent-emerald-500"
                     />
-                    This is correct
-                  </label>
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-sm font-semibold mb-2">Preferred installation date</label>
-                <input
+                <TextField
+                  label="Preferred installation date"
                   type="date"
                   value={form.preferredInstallDate}
                   onChange={(e) => updateSwitchForm({ preferredInstallDate: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-indigo-400"
+                  error={errors.preferredInstallDate}
                 />
-                {errors.preferredInstallDate && (
-                  <p className="text-xs text-rose-600 mt-1">{errors.preferredInstallDate}</p>
-                )}
-              </div>
 
-              <div>
-                <label className="block text-sm font-semibold mb-2">Preferred time slot</label>
-                <div className="grid grid-cols-3 gap-3">
-                  {["Morning", "Afternoon", "Evening"].map((slot) => (
-                    <button
-                      key={slot}
-                      type="button"
-                      onClick={() => updateSwitchForm({ preferredInstallSlot: slot })}
-                      className={`py-3 rounded-xl border text-sm font-medium transition-colors ${
-                        form.preferredInstallSlot === slot
-                          ? "border-indigo-500 bg-indigo-50 text-indigo-700"
-                          : "border-gray-200 hover:bg-gray-50"
-                      }`}
-                    >
-                      {slot}
-                    </button>
-                  ))}
+                <div className="ap-field">
+                  <span className="ap-field__label">Preferred time slot</span>
+                  <SegmentedControl
+                    label="Preferred time slot"
+                    value={form.preferredInstallSlot || "Morning"}
+                    onChange={(v) => updateSwitchForm({ preferredInstallSlot: v })}
+                    options={[
+                      { value: "Morning", label: "Morning" },
+                      { value: "Afternoon", label: "Afternoon" },
+                      { value: "Evening", label: "Evening" },
+                    ]}
+                  />
+                  {errors.preferredInstallSlot && <p className="ap-field__error">{errors.preferredInstallSlot}</p>}
                 </div>
-                {errors.preferredInstallSlot && (
-                  <p className="text-xs text-rose-600 mt-1">{errors.preferredInstallSlot}</p>
-                )}
-              </div>
 
-              <div className="flex gap-3">
-                <button
-                  onClick={() => goToStep(1)}
-                  className="flex-1 py-3.5 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors font-semibold"
-                >
-                  Back
-                </button>
-                <button
-                  onClick={() => validateStep2() && goToStep(3)}
-                  className="flex-[2] py-3.5 rounded-full bg-indigo-600 hover:bg-indigo-700 transition-colors text-white font-semibold"
-                >
-                  Continue
-                </button>
-              </div>
-            </div>
-          )}
-
-          {step === 3 && (
-            <div className="flex flex-col gap-5">
-              <div className="rounded-xl bg-gray-50 p-5 flex flex-col gap-4">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Full name</span>
-                  <span className="font-semibold">{form.fullName}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Current provider</span>
-                  <span className="font-semibold">
-                    {form.currentProvider === "other"
-                      ? "Someone else / no broadband"
-                      : form.currentProvider === "not_sure" || !form.currentProvider
-                        ? "Not sure"
-                        : PROVIDERS[form.currentProvider].name}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Current contract ends</span>
-                  <span className="font-semibold">
-                    {form.contractEndMonth === "not_sure" || form.contractEndYear === "not_sure" ||
-                    (!form.contractEndMonth && !form.contractEndYear)
-                      ? "Not sure"
-                      : `${form.contractEndMonth} ${form.contractEndYear}`}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Contact</span>
-                  <span className="font-semibold">
-                    {form.email} · {form.phone}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Installation address</span>
-                  <span className="font-semibold text-right">{state.selectedAddress}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Installation slot</span>
-                  <span className="font-semibold">
-                    {form.preferredInstallDate} · {form.preferredInstallSlot}
-                  </span>
+                <div className="ap-cluster">
+                  <Button variant="secondary" block onClick={() => goToStep(1)}>
+                    Back
+                  </Button>
+                  <Button block onClick={() => validateStep2() && goToStep(3)}>
+                    Continue
+                  </Button>
                 </div>
               </div>
+            )}
 
-              <p className="text-xs text-gray-400">
-                By confirming, you agree to switch your broadband to {provider.name} {deal.name} at{" "}
-                {formatPrice(currentMonthlyPrice(deal))}/month on a{" "}
-                {formatContract(deal.contract_months).toLowerCase()} contract. You can cancel free of charge
-                within 14 days.
-              </p>
+            {step === 3 && (
+              <div className="ap-stack">
+                <div className="ap-inset">
+                  <dl className="ap-kv">
+                    <div>
+                      <dt>Full name</dt>
+                      <dd>{form.fullName}</dd>
+                    </div>
+                    <div>
+                      <dt>Current provider</dt>
+                      <dd>
+                        {form.currentProvider === "other"
+                          ? "Someone else / no broadband"
+                          : form.currentProvider === "not_sure" || !form.currentProvider
+                            ? "Not sure"
+                            : PROVIDERS[form.currentProvider].name}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Current contract ends</dt>
+                      <dd>
+                        {form.contractEndMonth === "not_sure" ||
+                        form.contractEndYear === "not_sure" ||
+                        (!form.contractEndMonth && !form.contractEndYear)
+                          ? "Not sure"
+                          : `${form.contractEndMonth} ${form.contractEndYear}`}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Contact</dt>
+                      <dd>
+                        {form.email} · {form.phone}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Installation address</dt>
+                      <dd>{state.selectedAddress}</dd>
+                    </div>
+                    <div>
+                      <dt>Installation slot</dt>
+                      <dd>
+                        {form.preferredInstallDate} · {form.preferredInstallSlot}
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
 
-              <div className="flex gap-3">
-                <button
-                  onClick={() => goToStep(2)}
-                  className="flex-1 py-3.5 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors font-semibold"
-                >
-                  Back
-                </button>
-                <button
-                  onClick={() => goToStep(4)}
-                  className="flex-[2] py-3.5 rounded-full bg-emerald-600 hover:bg-emerald-700 transition-colors text-white font-semibold"
-                >
-                  Confirm switch
-                </button>
+                <p className="ap-footnote">
+                  By confirming, you agree to switch your broadband to {provider.name} {deal.name}. You can
+                  cancel free of charge within 14 days.
+                </p>
+
+                <div className="ap-cluster">
+                  <Button variant="secondary" block onClick={() => goToStep(2)}>
+                    Back
+                  </Button>
+                  <Button block onClick={() => goToStep(4)}>
+                    Confirm switch
+                  </Button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </Panel>
         </div>
       </div>
     </div>
   );
+}
+
+function Field2Row({ children }: { children: React.ReactNode }) {
+  return <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--ap-spacing-3)" }}>{children}</div>;
 }

@@ -1,8 +1,5 @@
 @import "tailwindcss";
-
-@theme {
-  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-}
+@import "@aptap/design-system/dist/tailwind-theme.css";
 
 html,
 body,
@@ -12,8 +9,8 @@ body,
 
 body {
   margin: 0;
-  background: #f4f5f7;
-  color: #0f1222;
+  background: var(--ap-color-background-subtle, #f4f5f7);
+  color: var(--ap-color-content-primary, #0f1222);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }

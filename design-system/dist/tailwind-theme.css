@@ -1,0 +1,155 @@
+/* ==========================================================================
+   ApTap Design System — tailwind-theme.css
+   Tailwind v4 @theme mapping onto semantic tokens only (see CLAUDE.md §2.9).
+   Primitive colour scales (color.primary.*, color.neutral.* etc.) are
+   deliberately NOT exposed here — components must reference a semantic or
+   component token, never a primitive, per rule #2.
+   ========================================================================== */
+@theme {
+  --font-sans: var(--ap-font-family-sans);
+
+  /* Colours — semantic tokens, without the 'color-' prefix */
+  --color-accent: var(--ap-color-accent);
+  --color-alpha-black-16: var(--ap-color-alpha-black-16);
+  --color-alpha-black-48: var(--ap-color-alpha-black-48);
+  --color-alpha-black-64: var(--ap-color-alpha-black-64);
+  --color-alpha-black-8: var(--ap-color-alpha-black-8);
+  --color-alpha-success-20: var(--ap-color-alpha-success-20);
+  --color-alpha-warning-15: var(--ap-color-alpha-warning-15);
+  --color-alpha-white-10: var(--ap-color-alpha-white-10);
+  --color-alpha-white-16: var(--ap-color-alpha-white-16);
+  --color-alpha-white-5: var(--ap-color-alpha-white-5);
+  --color-alpha-white-72: var(--ap-color-alpha-white-72);
+  --color-alpha-white-8: var(--ap-color-alpha-white-8);
+  --color-background-brand: var(--ap-color-background-brand);
+  --color-background-default: var(--ap-color-background-default);
+  --color-background-inverse: var(--ap-color-background-inverse);
+  --color-background-muted: var(--ap-color-background-muted);
+  --color-background-subtle: var(--ap-color-background-subtle);
+  --color-border-brand: var(--ap-color-border-brand);
+  --color-border-default: var(--ap-color-border-default);
+  --color-border-error: var(--ap-color-border-error);
+  --color-border-focus: var(--ap-color-border-focus);
+  --color-border-on-feature: var(--ap-color-border-on-feature);
+  --color-border-strong: var(--ap-color-border-strong);
+  --color-border-subtle: var(--ap-color-border-subtle);
+  --color-border-success: var(--ap-color-border-success);
+  --color-content-brand: var(--ap-color-content-brand);
+  --color-content-disabled: var(--ap-color-content-disabled);
+  --color-content-inverse: var(--ap-color-content-inverse);
+  --color-content-link: var(--ap-color-content-link);
+  --color-content-link-hover: var(--ap-color-content-link-hover);
+  --color-content-on-brand: var(--ap-color-content-on-brand);
+  --color-content-on-feature: var(--ap-color-content-on-feature);
+  --color-content-on-feature-secondary: var(--ap-color-content-on-feature-secondary);
+  --color-content-primary: var(--ap-color-content-primary);
+  --color-content-secondary: var(--ap-color-content-secondary);
+  --color-content-tertiary: var(--ap-color-content-tertiary);
+  --color-deal-best-value-background: var(--ap-color-deal-best-value-background);
+  --color-deal-best-value-content: var(--ap-color-deal-best-value-content);
+  --color-deal-perk-background: var(--ap-color-deal-perk-background);
+  --color-deal-perk-content: var(--ap-color-deal-perk-content);
+  --color-deal-perk-on-feature-background: var(--ap-color-deal-perk-on-feature-background);
+  --color-deal-perk-on-feature-content: var(--ap-color-deal-perk-on-feature-content);
+  --color-deal-price-fixed: var(--ap-color-deal-price-fixed);
+  --color-deal-price-fixed-background: var(--ap-color-deal-price-fixed-background);
+  --color-deal-price-rise: var(--ap-color-deal-price-rise);
+  --color-deal-price-rise-background: var(--ap-color-deal-price-rise-background);
+  --color-deal-price-rise-on-feature-background: var(--ap-color-deal-price-rise-on-feature-background);
+  --color-deal-price-rise-on-feature-content: var(--ap-color-deal-price-rise-on-feature-content);
+  --color-deal-recommended-background: var(--ap-color-deal-recommended-background);
+  --color-deal-recommended-border: var(--ap-color-deal-recommended-border);
+  --color-deal-recommended-content: var(--ap-color-deal-recommended-content);
+  --color-deal-trust-background: var(--ap-color-deal-trust-background);
+  --color-deal-trust-content: var(--ap-color-deal-trust-content);
+  --color-deal-unavailable: var(--ap-color-deal-unavailable);
+  --color-deal-why-label-on-feature: var(--ap-color-deal-why-label-on-feature);
+  --color-feedback-danger-background: var(--ap-color-feedback-danger-background);
+  --color-feedback-danger-border: var(--ap-color-feedback-danger-border);
+  --color-feedback-danger-content: var(--ap-color-feedback-danger-content);
+  --color-feedback-danger-icon: var(--ap-color-feedback-danger-icon);
+  --color-feedback-danger-solid: var(--ap-color-feedback-danger-solid);
+  --color-feedback-info-background: var(--ap-color-feedback-info-background);
+  --color-feedback-info-border: var(--ap-color-feedback-info-border);
+  --color-feedback-info-content: var(--ap-color-feedback-info-content);
+  --color-feedback-info-icon: var(--ap-color-feedback-info-icon);
+  --color-feedback-info-solid: var(--ap-color-feedback-info-solid);
+  --color-feedback-success-background: var(--ap-color-feedback-success-background);
+  --color-feedback-success-border: var(--ap-color-feedback-success-border);
+  --color-feedback-success-content: var(--ap-color-feedback-success-content);
+  --color-feedback-success-icon: var(--ap-color-feedback-success-icon);
+  --color-feedback-success-solid: var(--ap-color-feedback-success-solid);
+  --color-feedback-warning-background: var(--ap-color-feedback-warning-background);
+  --color-feedback-warning-border: var(--ap-color-feedback-warning-border);
+  --color-feedback-warning-content: var(--ap-color-feedback-warning-content);
+  --color-feedback-warning-icon: var(--ap-color-feedback-warning-icon);
+  --color-feedback-warning-solid: var(--ap-color-feedback-warning-solid);
+  --color-focus-halo: var(--ap-color-focus-halo);
+  --color-focus-ring: var(--ap-color-focus-ring);
+  --color-interactive-destructive-content: var(--ap-color-interactive-destructive-content);
+  --color-interactive-destructive-default: var(--ap-color-interactive-destructive-default);
+  --color-interactive-destructive-hover: var(--ap-color-interactive-destructive-hover);
+  --color-interactive-destructive-pressed: var(--ap-color-interactive-destructive-pressed);
+  --color-interactive-ghost-content: var(--ap-color-interactive-ghost-content);
+  --color-interactive-ghost-hover: var(--ap-color-interactive-ghost-hover);
+  --color-interactive-ghost-pressed: var(--ap-color-interactive-ghost-pressed);
+  --color-interactive-inverse-content: var(--ap-color-interactive-inverse-content);
+  --color-interactive-inverse-default: var(--ap-color-interactive-inverse-default);
+  --color-interactive-inverse-hover: var(--ap-color-interactive-inverse-hover);
+  --color-interactive-primary-content: var(--ap-color-interactive-primary-content);
+  --color-interactive-primary-content-disabled: var(--ap-color-interactive-primary-content-disabled);
+  --color-interactive-primary-default: var(--ap-color-interactive-primary-default);
+  --color-interactive-primary-disabled: var(--ap-color-interactive-primary-disabled);
+  --color-interactive-primary-hover: var(--ap-color-interactive-primary-hover);
+  --color-interactive-primary-pressed: var(--ap-color-interactive-primary-pressed);
+  --color-interactive-secondary-border: var(--ap-color-interactive-secondary-border);
+  --color-interactive-secondary-content: var(--ap-color-interactive-secondary-content);
+  --color-interactive-secondary-default: var(--ap-color-interactive-secondary-default);
+  --color-interactive-secondary-hover: var(--ap-color-interactive-secondary-hover);
+  --color-interactive-secondary-pressed: var(--ap-color-interactive-secondary-pressed);
+  --color-interactive-selected-background: var(--ap-color-interactive-selected-background);
+  --color-interactive-selected-border: var(--ap-color-interactive-selected-border);
+  --color-interactive-selected-content: var(--ap-color-interactive-selected-content);
+  --color-interactive-tertiary-content: var(--ap-color-interactive-tertiary-content);
+  --color-interactive-tertiary-default: var(--ap-color-interactive-tertiary-default);
+  --color-interactive-tertiary-hover: var(--ap-color-interactive-tertiary-hover);
+  --color-scrim: var(--ap-color-scrim);
+  --color-skeleton: var(--ap-color-skeleton);
+  --color-skeleton-shine: var(--ap-color-skeleton-shine);
+  --color-surface-brand-subtle: var(--ap-color-surface-brand-subtle);
+  --color-surface-default: var(--ap-color-surface-default);
+  --color-surface-feature: var(--ap-color-surface-feature);
+  --color-surface-feature-inset: var(--ap-color-surface-feature-inset);
+  --color-surface-inverse: var(--ap-color-surface-inverse);
+  --color-surface-overlay: var(--ap-color-surface-overlay);
+  --color-surface-raised: var(--ap-color-surface-raised);
+  --color-surface-sunken: var(--ap-color-surface-sunken);
+
+  /* Radius */
+  --radius-2xl: var(--ap-radius-2xl);
+  --radius-full: var(--ap-radius-full);
+  --radius-lg: var(--ap-radius-lg);
+  --radius-md: var(--ap-radius-md);
+  --radius-none: var(--ap-radius-none);
+  --radius-sm: var(--ap-radius-sm);
+  --radius-xl: var(--ap-radius-xl);
+  --radius-xs: var(--ap-radius-xs);
+
+  /* Shape (role-based radius aliases: card, pill, control, hero, sheet, inset, inner, tag) */
+  --radius-card: var(--ap-shape-card);
+  --radius-control: var(--ap-shape-control);
+  --radius-hero: var(--ap-shape-hero);
+  --radius-inner: var(--ap-shape-inner);
+  --radius-inset: var(--ap-shape-inset);
+  --radius-pill: var(--ap-shape-pill);
+  --radius-sheet: var(--ap-shape-sheet);
+  --radius-tag: var(--ap-shape-tag);
+
+  /* Elevation / shadow */
+  --shadow-brand: var(--ap-elevation-brand);
+  --shadow-lg: var(--ap-elevation-lg);
+  --shadow-md: var(--ap-elevation-md);
+  --shadow-none: var(--ap-elevation-none);
+  --shadow-sm: var(--ap-elevation-sm);
+  --shadow-xl: var(--ap-elevation-xl);
+}

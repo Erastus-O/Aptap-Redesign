@@ -1,0 +1,22 @@
+/* ==========================================================================
+   ApTap Design System — fonts.css
+   Raleway, self-hosted (decision D4): no third-party font calls inside bank
+   webviews. Official Google Fonts variable-font release (OFL-1.1, see
+   ../../OFL.txt), vendored as two files covering the full 100–900 weight
+   axis in upright and italic.
+   ========================================================================== */
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('../assets/fonts/raleway-variable.woff2') format('woff2-variations'), url('../assets/fonts/raleway-variable.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Raleway';
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('../assets/fonts/raleway-italic-variable.woff2') format('woff2-variations'), url('../assets/fonts/raleway-italic-variable.woff2') format('woff2');
+}

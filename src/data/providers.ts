@@ -1,3 +1,5 @@
+import bt from "../assets/logos/bt.jpg";
+import hyperoptic from "../assets/logos/hyperoptic.png";
 import type { Provider, ProviderSlug } from "../types";
 
 export const PROVIDERS: Record<ProviderSlug, Provider> = {
@@ -10,3 +12,17 @@ export const PROVIDERS: Record<ProviderSlug, Provider> = {
 };
 
 export const PROVIDER_LIST = Object.values(PROVIDERS);
+
+/**
+ * Real logo artwork we have on file, for the design system's <Avatar>.
+ * Providers not listed here fall back to the design system's own monogram —
+ * honest default rather than an invented badge design.
+ */
+const PROVIDER_LOGOS: Partial<Record<ProviderSlug, { src: string; fill: boolean }>> = {
+  BT: { src: bt, fill: true },
+  Hyperoptic: { src: hyperoptic, fill: false },
+};
+
+export function providerLogo(slug: ProviderSlug): { src?: string; fill?: boolean } {
+  return PROVIDER_LOGOS[slug] ?? {};
+}
