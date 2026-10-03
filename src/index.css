@@ -99,6 +99,15 @@ body {
 .ap-hero-search::before {
   content: none;
 }
+/* The base component relies on overflow:hidden to clip its square-cornered
+   glow ::before to the hero's rounded corners. We replaced that glow with a
+   background-image above (which clips to border-radius on its own), so
+   overflow can open up here — letting the address-picker dropdown float
+   below the search box as a true overlay instead of being clipped by the
+   hero's own bottom edge. */
+.ap-hero-search {
+  overflow: visible;
+}
 @media (max-width: 767px) {
   /* The photo is a wide landscape crop; in a narrower, taller mobile hero
      "cover" zooms in on the right edge far enough that the cube crowds the

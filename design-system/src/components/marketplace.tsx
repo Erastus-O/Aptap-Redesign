@@ -80,14 +80,16 @@ export function HeroSearch({ eyebrow = "Broadband marketplace", title, lede, onS
       <p className="ap-hero-search__eyebrow">{eyebrow}</p>
       <h1 id={`${id}-t`} className="ap-hero-search__title">{title}</h1>
       {lede && <p className="ap-hero-search__lede">{lede}</p>}
-      <form className="ap-search-box" onSubmit={submit} noValidate>
-        <label htmlFor={`${id}-pc`} className="ap-visually-hidden">Postcode</label>
-        <input id={`${id}-pc`} className="ap-input" placeholder="Enter your postcode" autoComplete="postal-code" value={pc}
-          onChange={(e) => setPc(e.target.value)} aria-invalid={err ? true : undefined} aria-describedby={err ? `${id}-err` : undefined} />
-        <Button type="submit">Check for availability</Button>
-      </form>
-      {err && <p id={`${id}-err`} role="alert" className="ap-hero-search__lede">{err}</p>}
-      {children}
+      <div className="ap-hero-search__anchor">
+        <form className="ap-search-box" onSubmit={submit} noValidate>
+          <label htmlFor={`${id}-pc`} className="ap-visually-hidden">Postcode</label>
+          <input id={`${id}-pc`} className="ap-input" placeholder="Enter your postcode" autoComplete="postal-code" value={pc}
+            onChange={(e) => setPc(e.target.value)} aria-invalid={err ? true : undefined} aria-describedby={err ? `${id}-err` : undefined} />
+          <Button type="submit">Check for availability</Button>
+        </form>
+        {err && <p id={`${id}-err`} role="alert" className="ap-hero-search__lede">{err}</p>}
+        {children}
+      </div>
     </section>
   );
 }
