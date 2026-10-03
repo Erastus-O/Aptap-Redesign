@@ -145,7 +145,7 @@ export default function Deals() {
       </div>
 
       <div className="ap-container" style={{ paddingBlock: "var(--ap-spacing-6)" }}>
-        <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-6 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-6 items-start">
           <ProviderFilter
             providers={addressProviders}
             selected={state.selectedProviders.filter((p) => addressProviders.includes(p))}

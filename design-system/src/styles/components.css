@@ -874,7 +874,7 @@
    them, looking far wider than the row layout's own 150px buttons. */
 .ap-deal-card--list .ap-deal-card__actions > .ap-btn { flex: 0 0 auto; }
 .ap-deal-card--list .ap-stats--grid { grid-template-columns: repeat(3, max-content); justify-content: start; }
-@container (min-width: 1040px) {
+@container (min-width: 990px) {
   /* Identity takes the flexible leftover space; the stats group and the
      action buttons are each fixed-width (150px per stat, 150px per
      button) rather than sized by content, so every card lines up on the
@@ -884,8 +884,10 @@
      limit, so it absorbs leftover grid space ahead of the 1fr identity
      column whenever the row is wider than its content needs — a definite
      length can't grow past itself, so the 1fr column gets that space
-     instead, exactly as intended. */
-  .ap-deal-card__row { display: grid; grid-template-columns: minmax(200px, 1fr) 474px 312px; align-items: start; gap: var(--ap-spacing-5); }
+     instead, exactly as intended. Identity's own floor (160px) is kept
+     low deliberately, so the row still fits on an ordinary 1366-1440px
+     laptop window rather than only on a wide monitor. */
+  .ap-deal-card__row { display: grid; grid-template-columns: minmax(160px, 1fr) 474px 312px; align-items: start; gap: var(--ap-spacing-5); }
   .ap-deal-card--list .ap-stats--grid { grid-template-columns: repeat(3, 150px); }
   .ap-deal-card--list .ap-deal-card__actions { flex-wrap: nowrap; }
   .ap-deal-card--list .ap-deal-card__actions > .ap-btn { flex: 0 0 150px; }

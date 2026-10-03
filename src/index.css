@@ -70,14 +70,21 @@ body {
 }
 @media (min-width: 1200px) {
   :root {
-    --ap-space-page-margin: var(--ap-spacing-16);
-    /* Content column (1200px stock → 1400px) — wider than stock, not
-       narrower, because the Deals page's list cards now need the room:
-       fixing their 3 stat columns and 2 action buttons at 150px each
-       (below) needs ~1026px of card width on its own. Still keeps a
-       larger gutter than the original 24px desktop margin via the bigger
-       --ap-space-page-margin above. */
+    /* A smaller margin here (not the full --spacing-16 yet) deliberately:
+       the Deals page's list cards need ~1000px of width to show their
+       single-row layout (150px-fixed stats + buttons), and at a common
+       1366-1440px browser window, every extra pixel spent on margin here
+       is a pixel the card doesn't have — a bigger margin at this tier
+       would push the row layout out of reach on an ordinary laptop. */
+    --ap-space-page-margin: var(--ap-spacing-8);
     --ap-container-desktop: 1400px;
+  }
+}
+@media (min-width: 1600px) {
+  :root {
+    /* Past 1600px there's room to spare regardless, so the gutter can grow
+       to its full size without taking that room away from the card. */
+    --ap-space-page-margin: var(--ap-spacing-16);
   }
 }
 
