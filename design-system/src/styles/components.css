@@ -755,6 +755,8 @@
 .ap-results-summary__network { font-size: var(--ap-type-caption-size); font-weight: var(--ap-font-weight-medium); color: var(--ap-color-content-brand); }
 
 /* ---------- Provider filter (checkbox list with count + Clear) ---------- */
+.ap-filter-summary { display: flex; align-items: center; justify-content: space-between; gap: var(--ap-spacing-3); margin-bottom: var(--ap-spacing-2); }
+.ap-filter-summary__count { font-size: var(--ap-type-caption-size); color: var(--ap-color-content-tertiary); }
 .ap-filter-list { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
 .ap-filter-list .ap-choice { min-height: 40px; padding-block: var(--ap-spacing-2); align-items: center; }
 .ap-filter-list .ap-choice__control { margin-top: 0; }

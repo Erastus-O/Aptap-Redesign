@@ -142,9 +142,13 @@ export function ProviderFilter({ providers, selected, onChange }: { providers: s
   const id = useId();
   const toggle = (p: string) => onChange(selected.includes(p) ? selected.filter((x) => x !== p) : [...selected, p]);
   return (
-    <Panel title="Providers" titleSize="sm" subtitle={<span aria-live="polite">{selected.length} selected</span>}
-      action={selected.length > 0 ? <Button variant="link" onClick={() => onChange([])}>Clear<span className="ap-visually-hidden"> provider filters</span></Button>
-                                  : <Button variant="link" onClick={() => onChange(providers)}>Select all</Button>}>
+    <Panel title="Providers" titleSize="sm">
+      <div className="ap-filter-summary">
+        <span className="ap-filter-summary__count" aria-live="polite">{selected.length} selected</span>
+        {selected.length > 0
+          ? <Button variant="link" onClick={() => onChange([])}>Clear<span className="ap-visually-hidden"> provider filters</span></Button>
+          : <Button variant="link" onClick={() => onChange(providers)}>Select all</Button>}
+      </div>
       <fieldset className="ap-fieldset">
         <legend className="ap-visually-hidden">Show deals from</legend>
         <ul className="ap-filter-list">
