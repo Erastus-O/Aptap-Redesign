@@ -82,13 +82,31 @@ body {
   min-height: calc(var(--ap-type-body-md-line-height) * 2em);
 }
 
-/* ---- Hero: darker, more purple glow (ApTap's own gradient tokens — no new
-   hardcoded colors), replacing the stock blue-leaning two-blob glow. ---- */
+/* ---- Hero: the provided artwork (dark-to-purple glow with a glass cube) as
+   the background photo. It's naturally near-black on the left, where the
+   title and search box sit, and purple/lit on the right — so it reads well
+   under text without needing a separate glow layer. A thin dark linear
+   gradient is layered on top purely as a contrast safety net for the text,
+   in case the image is ever cropped lighter than expected at odd widths. */
+.ap-hero-search {
+  background-image:
+    linear-gradient(90deg, color-mix(in srgb, black 55%, transparent) 0%, transparent 55%),
+    url('./assets/images/hero-bg.webp');
+  background-size: cover;
+  background-position: center right;
+  background-repeat: no-repeat;
+}
 .ap-hero-search::before {
-  background:
-    radial-gradient(70% 60% at 12% -10%, color-mix(in srgb, var(--ap-color-primary-600) 42%, transparent), transparent 70%),
-    radial-gradient(55% 50% at 100% 100%, color-mix(in srgb, var(--ap-color-accent) 22%, transparent), transparent 70%),
-    linear-gradient(155deg, color-mix(in srgb, var(--ap-color-primary-600) 22%, transparent) 0%, transparent 50%);
+  content: none;
+}
+@media (max-width: 767px) {
+  /* The photo is a wide landscape crop; in a narrower, taller mobile hero
+     "cover" zooms in on the right edge far enough that the cube crowds the
+     text. Pulling the focal point in gives the title a cleaner, darker
+     backdrop while keeping a hint of the glow visible. */
+  .ap-hero-search {
+    background-position: 60% center;
+  }
 }
 
 /* ---- "Why we recommend it": fixed height so the three carousel cards line
