@@ -52,18 +52,15 @@ export default function Home() {
               We couldn't load today's deals ({deals.error}). Try refreshing the page.
             </p>
           )}
-        </HeroSearch>
-
-        {showResults && state.addresses.length > 0 && (
-          <div style={{ marginTop: "var(--ap-spacing-5)" }}>
+          {showResults && state.addresses.length > 0 && (
             <AddressPicker
               postcode={state.postcode.toUpperCase()}
               addresses={state.addresses}
               onSelect={handleSelectAddress}
               onClose={() => setShowResults(false)}
             />
-          </div>
-        )}
+          )}
+        </HeroSearch>
       </div>
 
       <div className="ap-container" style={{ paddingBlock: "var(--ap-spacing-8)" }}>
