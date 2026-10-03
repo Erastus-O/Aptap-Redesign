@@ -145,16 +145,12 @@ body {
   }
 }
 
-/* ---- Deal logo icons: 80×80, scoped to the Identity pattern (deal cards,
-   deal details hero, selected-deal summary) rather than every Avatar in the
-   app — DealerTile (Home) and CompareTable keep their own smaller sizes,
-   which suit those denser layouts. ---- */
+/* ---- Deal logo icons: 40×40 (the design system's own default "md" avatar
+   size), scoped to the Identity pattern so it stays explicit regardless of
+   what the component's own default happens to be. ---- */
 .ap-identity .ap-avatar {
-  width: 80px;
-  height: 80px;
-}
-.ap-identity .ap-avatar__fallback {
-  font-size: var(--ap-type-h3-size);
+  width: 40px;
+  height: 40px;
 }
 
 /* ---- "Why we recommend it": fixed height so the three carousel cards line
