@@ -867,17 +867,28 @@
 .ap-deal-card__row { display: flex; flex-direction: column; gap: var(--ap-spacing-4); }
 .ap-deal-card__identity-group { display: flex; flex-direction: column; gap: var(--ap-spacing-2); }
 .ap-deal-card--list .ap-deal-card__actions { flex-direction: row; flex-wrap: wrap; }
-.ap-deal-card--list .ap-deal-card__actions > .ap-btn { flex: 1 1 140px; }
-@container (min-width: 800px) {
-  /* Identity takes the flexible leftover space; the stats group keeps a
-     280px floor (its 3 values' own natural width, so none of the three
-     labels wrap) but no longer stretches past it; the action buttons are
-     sized to their own content ("auto"). Net effect: the stats and buttons
-     sit hugged together on the right instead of stretching out with dead
-     space between the stat values and the buttons. */
-  .ap-deal-card__row { display: grid; grid-template-columns: minmax(200px, 1fr) minmax(280px, auto) auto; align-items: start; gap: var(--ap-spacing-5); }
+/* Hug content at every width, including the stacked (pre-container-query)
+   layout below — without this, a card wide enough to almost fit one row
+   but not quite (e.g. a tablet width just under the 1040px cutoff) would
+   stretch the buttons to split the full row width between just two of
+   them, looking far wider than the row layout's own 150px buttons. */
+.ap-deal-card--list .ap-deal-card__actions > .ap-btn { flex: 0 0 auto; }
+.ap-deal-card--list .ap-stats--grid { grid-template-columns: repeat(3, max-content); justify-content: start; }
+@container (min-width: 1040px) {
+  /* Identity takes the flexible leftover space; the stats group and the
+     action buttons are each fixed-width (150px per stat, 150px per
+     button) rather than sized by content, so every card lines up on the
+     same grid regardless of how long its values or labels are. These two
+     columns use a definite length (not minmax(_, auto)) deliberately: an
+     "auto" max track sizing function has an effectively infinite growth
+     limit, so it absorbs leftover grid space ahead of the 1fr identity
+     column whenever the row is wider than its content needs — a definite
+     length can't grow past itself, so the 1fr column gets that space
+     instead, exactly as intended. */
+  .ap-deal-card__row { display: grid; grid-template-columns: minmax(200px, 1fr) 474px 312px; align-items: start; gap: var(--ap-spacing-5); }
+  .ap-deal-card--list .ap-stats--grid { grid-template-columns: repeat(3, 150px); }
   .ap-deal-card--list .ap-deal-card__actions { flex-wrap: nowrap; }
-  .ap-deal-card--list .ap-deal-card__actions > .ap-btn { flex: 0 0 auto; }
+  .ap-deal-card--list .ap-deal-card__actions > .ap-btn { flex: 0 0 150px; }
 }
 .ap-deal-card__meta-pills { display: flex; flex-wrap: wrap; gap: var(--ap-spacing-2); }
 

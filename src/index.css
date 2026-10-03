@@ -71,14 +71,13 @@ body {
 @media (min-width: 1200px) {
   :root {
     --ap-space-page-margin: var(--ap-spacing-16);
-    /* Narrower content column (1200px stock → 1160px) so the page reads as
-       a centred card floating in generous whitespace on wide screens,
-       instead of the margin/padding split cancelling out at a fixed total
-       width — reducing the content width is what actually grows the
-       visible gutter once the container is past its max-width. Kept to
-       1160 (not narrower) so the Deals page's sidebar + list-card layout
-       still has room for the deal card's single-row format. */
-    --ap-container-desktop: 1160px;
+    /* Content column (1200px stock → 1400px) — wider than stock, not
+       narrower, because the Deals page's list cards now need the room:
+       fixing their 3 stat columns and 2 action buttons at 150px each
+       (below) needs ~1026px of card width on its own. Still keeps a
+       larger gutter than the original 24px desktop margin via the bigger
+       --ap-space-page-margin above. */
+    --ap-container-desktop: 1400px;
   }
 }
 
