@@ -59,8 +59,12 @@ body {
   }
 }
 
+/* auto-fit (not auto-fill): collapses empty tracks so the tiles actually
+   stretch to fill the row edge-to-edge instead of leaving dead space when
+   the count doesn't divide evenly into the available width. */
 .ap-dealer-grid {
-  grid-template-columns: repeat(auto-fill, minmax(min(110px, 40%), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(110px, 40%), 1fr));
+  gap: var(--ap-spacing-4);
 }
 
 /* ---- Dealer tile name: reserve 2 lines of height so a longer provider name
