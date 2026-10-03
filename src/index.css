@@ -43,7 +43,6 @@ body {
   --ap-space-stack-section: var(--ap-spacing-4);
   --ap-space-page-margin: var(--ap-spacing-4);
   --ap-panel-gap: var(--ap-spacing-2);
-  --ap-hero-padding: var(--ap-spacing-6);
   --ap-dealer-tile-padding: var(--ap-spacing-2);
 
   /* Lighter field labels: the input's own value should be the thing that
@@ -125,6 +124,12 @@ body {
    hero's own bottom edge. */
 .ap-hero-search {
   overflow: visible;
+}
+/* Uniform 16px padding on every side, overriding the stock rule's
+   asymmetric vertical/horizontal split (and its own separate mobile
+   values) at every width. */
+.ap-hero-search {
+  padding: var(--ap-spacing-4);
 }
 @media (max-width: 767px) {
   /* The photo is a wide landscape crop; in a narrower, taller mobile hero
