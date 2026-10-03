@@ -868,8 +868,14 @@
 .ap-deal-card__identity-group { display: flex; flex-direction: column; gap: var(--ap-spacing-2); }
 .ap-deal-card--list .ap-deal-card__actions { flex-direction: row; flex-wrap: wrap; }
 .ap-deal-card--list .ap-deal-card__actions > .ap-btn { flex: 1 1 140px; }
-@container (min-width: 720px) {
-  .ap-deal-card__row { display: grid; grid-template-columns: minmax(230px, 1.6fr) minmax(240px, 1.8fr) auto; align-items: start; gap: var(--ap-spacing-5); }
+@container (min-width: 800px) {
+  /* Identity takes the flexible leftover space; the stats group keeps a
+     280px floor (its 3 values' own natural width, so none of the three
+     labels wrap) but no longer stretches past it; the action buttons are
+     sized to their own content ("auto"). Net effect: the stats and buttons
+     sit hugged together on the right instead of stretching out with dead
+     space between the stat values and the buttons. */
+  .ap-deal-card__row { display: grid; grid-template-columns: minmax(200px, 1fr) minmax(280px, auto) auto; align-items: start; gap: var(--ap-spacing-5); }
   .ap-deal-card--list .ap-deal-card__actions { flex-wrap: nowrap; }
   .ap-deal-card--list .ap-deal-card__actions > .ap-btn { flex: 0 0 auto; }
 }
