@@ -853,11 +853,11 @@
   border: var(--ap-border-width-1) solid var(--ap-card-border);
 }
 .ap-deal-card__row { display: flex; flex-direction: column; gap: var(--ap-spacing-4); }
+.ap-deal-card__identity-group { display: flex; flex-direction: column; gap: var(--ap-spacing-2); }
 .ap-deal-card--list .ap-deal-card__actions { flex-direction: row; flex-wrap: wrap; }
 .ap-deal-card--list .ap-deal-card__actions > .ap-btn { flex: 1 1 140px; }
 @container (min-width: 720px) {
-  .ap-deal-card__row { display: grid; grid-template-columns: minmax(180px, 1.3fr) auto minmax(260px, 2fr) auto; align-items: center; gap: var(--ap-spacing-5); }
-  .ap-deal-card__row .ap-deal-card__meta-pills { flex-direction: column; align-items: flex-start; }
+  .ap-deal-card__row { display: grid; grid-template-columns: minmax(180px, 1.3fr) minmax(260px, 2fr) auto; align-items: center; gap: var(--ap-spacing-5); }
   .ap-deal-card--list .ap-deal-card__actions { flex-wrap: nowrap; }
   .ap-deal-card--list .ap-deal-card__actions > .ap-btn { flex: 0 0 auto; }
 }

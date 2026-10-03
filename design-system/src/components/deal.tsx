@@ -148,12 +148,14 @@ function ListDealCard({ deal, logoSrc, logoFill, onChoose, onDetails, comparing,
   return (
     <article className={cx("ap-deal-card ap-deal-card--list", unavailable && "ap-deal-card--unavailable", className)} style={style} aria-labelledby={titleId}>
       <div className="ap-deal-card__row">
-        <Identity deal={deal} logoSrc={logoSrc} logoFill={logoFill} headingLevel={headingLevel} id={titleId} />
+        <div className="ap-deal-card__identity-group">
+          <Identity deal={deal} logoSrc={logoSrc} logoFill={logoFill} headingLevel={headingLevel} id={titleId} />
+          {!unavailable && <div className="ap-deal-card__meta-pills"><PerkPill deal={deal} /><PricePill deal={deal} /></div>}
+        </div>
         {unavailable ? (
           <p className="ap-deal-card__unavailable">Not available at this address</p>
         ) : (
           <>
-            <div className="ap-deal-card__meta-pills"><PerkPill deal={deal} /><PricePill deal={deal} /></div>
             <StatGroup grid items={[
               { label: "Speed", value: deal.download_mbps != null ? formatSpeed(deal.download_mbps) : "Varies" },
               { label: "Monthly price", value: formatGBP(deal.monthly_price) },
