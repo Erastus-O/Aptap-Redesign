@@ -63,6 +63,16 @@ body {
   grid-template-columns: repeat(auto-fill, minmax(min(110px, 40%), 1fr));
 }
 
+/* ---- Dealer tile name: reserve 2 lines of height so a longer provider name
+   (e.g. "Virgin Media") that wraps doesn't push its "View deals" button out
+   of line with the single-line names next to it in the grid row. ---- */
+.ap-dealer-tile__name {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(var(--ap-type-body-md-line-height) * 2em);
+}
+
 /* ---- Hero: darker, more purple glow (ApTap's own gradient tokens — no new
    hardcoded colors), replacing the stock blue-leaning two-blob glow. ---- */
 .ap-hero-search::before {
