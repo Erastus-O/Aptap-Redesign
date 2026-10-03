@@ -1,4 +1,6 @@
 import { useNavigate } from "react-router-dom";
+import aptapLogo from "../assets/logos/aptap.png";
+import barclaysLogo from "../assets/logos/barclays.webp";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -13,15 +15,10 @@ export default function Header() {
           <span aria-hidden>←</span>
           Go back to marketplace
         </button>
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <div className="flex items-center gap-1.5 text-indigo-600 font-extrabold text-lg tracking-tight">
-            <span className="text-xl" aria-hidden>
-              📡
-            </span>
-            APTAP
-          </div>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <img src={aptapLogo} alt="Aptap" className="h-10 w-auto" />
           <span className="text-gray-400 text-sm">in partnership with</span>
-          <span className="text-sky-500 font-serif font-bold text-xl tracking-tight">BARCLAYS</span>
+          <img src={barclaysLogo} alt="Barclays" className="h-12 w-auto" />
         </div>
       </div>
     </header>
