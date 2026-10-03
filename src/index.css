@@ -77,7 +77,11 @@ body {
        is a pixel the card doesn't have — a bigger margin at this tier
        would push the row layout out of reach on an ordinary laptop. */
     --ap-space-page-margin: var(--ap-spacing-8);
-    --ap-container-desktop: 1400px;
+    /* 1450, not 1400: the identity column's cap (components.css) needs
+       enough leftover card width that its perk pill — "Up to £300
+       towards leaving fees (bill credit)", ~285px unwrapped — fits on one
+       line once the page container hits this max-width. */
+    --ap-container-desktop: 1450px;
   }
 }
 @media (min-width: 1600px) {

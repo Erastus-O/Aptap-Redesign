@@ -881,13 +881,16 @@
      leftover grid space once the row is wider than its content needs.
      That's what produced a large dead gap after the identity column on
      wide screens: it kept growing to fill the row while stats/actions
-     stayed put. Capping identity at 280px keeps the row reading as one
+     stayed put. Capping identity at 320px keeps the row reading as one
      tight, hugged unit (logo+title+price / stats / buttons) at any width
      — any leftover space beyond the three columns' combined max just
      becomes trailing padding at the end of the row, never a gap inside
-     it. 160px is still its floor, for the narrowest width this row
+     it. 320px (not the previous 280px) specifically because the perk
+     pill text ("Up to £300 towards leaving fees (bill credit)") needs
+     ~285px unwrapped; 280px was just short of that, wrapping it to 2
+     lines. 160px is still its floor, for the narrowest width this row
      engages at. */
-  .ap-deal-card__row { display: grid; grid-template-columns: minmax(160px, 280px) 474px 312px; align-items: start; gap: var(--ap-spacing-5); justify-content: start; }
+  .ap-deal-card__row { display: grid; grid-template-columns: minmax(160px, 320px) 474px 312px; align-items: start; gap: var(--ap-spacing-5); justify-content: start; }
   .ap-deal-card--list .ap-stats--grid { grid-template-columns: repeat(3, 150px); }
   .ap-deal-card--list .ap-deal-card__actions { flex-wrap: nowrap; }
   .ap-deal-card--list .ap-deal-card__actions > .ap-btn { flex: 0 0 150px; }
