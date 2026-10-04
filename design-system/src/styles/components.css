@@ -889,8 +889,9 @@
      pill text ("Up to £300 towards leaving fees (bill credit)") needs
      ~285px unwrapped; 280px was just short of that, wrapping it to 2
      lines. 160px is still its floor, for the narrowest width this row
-     engages at. */
-  .ap-deal-card__row { display: grid; grid-template-columns: minmax(160px, 320px) 474px 312px; align-items: start; gap: var(--ap-spacing-5); justify-content: start; }
+     engages at. Row gap trimmed to --spacing-4 (from --spacing-5): one
+     more small save that goes straight to identity's share of the row. */
+  .ap-deal-card__row { display: grid; grid-template-columns: minmax(160px, 320px) 474px 312px; align-items: start; gap: var(--ap-spacing-4); justify-content: start; }
   .ap-deal-card--list .ap-stats--grid { grid-template-columns: repeat(3, 150px); }
   .ap-deal-card--list .ap-deal-card__actions { flex-wrap: nowrap; }
   .ap-deal-card--list .ap-deal-card__actions > .ap-btn { flex: 0 0 150px; }

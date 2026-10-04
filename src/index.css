@@ -75,8 +75,11 @@ body {
        single-row layout (150px-fixed stats + buttons), and at a common
        1366-1440px browser window, every extra pixel spent on margin here
        is a pixel the card doesn't have — a bigger margin at this tier
-       would push the row layout out of reach on an ordinary laptop. */
-    --ap-space-page-margin: var(--ap-spacing-8);
+       would push the row layout out of reach on an ordinary laptop.
+       Tightened further to --spacing-6 (from --spacing-8): freeing up
+       16px here is 16px closer to fitting the perk pill on one line at
+       this same ordinary laptop width (see components.css). */
+    --ap-space-page-margin: var(--ap-spacing-6);
     /* 1450, not 1400: the identity column's cap (components.css) needs
        enough leftover card width that its perk pill — "Up to £300
        towards leaving fees (bill credit)", ~285px unwrapped — fits on one
